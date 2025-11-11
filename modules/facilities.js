@@ -1,3 +1,5 @@
+const cloudinary = require("../config/cloudinary.js");
+
 class Facilities {
   constructor(utility) {
     this.utility = utility;
@@ -82,55 +84,103 @@ class Facilities {
   };
 
 
-//   createFacility = async(req, res) => {
-//       try {
-//         const {  p_org_id,  p_name,  type,  industry,  registration_number,  admin_name,  admin_email,  admin_phone,  address_line1,  city,  state,  country,  postal_code,  office_mail,  office_phone,  id_document,  tax_document  } = req.body;
+ 
 
-//         // Basic validation
-//         if (!org_id || !name) {
-//           return this.utility.response.init(res, false, "org_id and name are required");
-//         }
+// createNewFacility = async (req, res) => {
+//   try {  
+//     const {
+//       p_org_id,
+//       p_facility_name,
+//       p_gst_number,
+//       p_admin_name,
+//       p_admin_email,
+//       p_admin_phone,
+//       p_address_line1,
+//       p_city,
+//       p_state,
+//       p_country,
+//       p_postal_code,
+//       p_id_document,
+//       p_tax_document
+      
+//       // p_name,
+//       // p_type,
+//       // p_industry,
+//       // p_registration_number,
+//       // p_office_mail,
+//       // p_office_phone,
 
-// const query = `
-//   SELECT * FROM fn_create_facility(
-//     $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17
-//   )
-// `;
-
-// const values = [
-//   p_org_id, p_name, p_type, p_industry, p_registration_number, p_admin_name,
-//   p_admin_email, p_admin_phone, p_address_line1, p_city, p_state,
-//   p_country, p_postal_code, p_office_mail, p_office_phone,
-//   p_id_document, p_tax_document
-// ];
-
-// const result = await pool.query(query, values);
-// console.log(result.rows[0]);
-
-//         console.log(query);
-
-//         // const result = await this.utility.sql.query(query);
-
-//         console.log("result->>",result);
-
-//             if (!result.rows) {
-//               return this.utility.response.init(res, false, "No response from database", {
-//                 error: "DATABASE_ERROR"
-//               }, 500);
-//             }
+//     } = req.body;
+  
+//     const query =  {
+//     text : `SELECT * FROM public.create_new_facility( 
+//             $1, $2, $3, $4, $5,
+//             $6, $7, $8, $9, $10,
+//             $11, $12, $13 )`,
+//     values : [
+//       p_org_id,
+//       p_facility_name,
+//       p_gst_number,
+//       p_admin_name,
+//       p_admin_email,
+//       p_admin_phone,
+//       p_address_line1,
+//       p_city,
+//       p_state,
+//       p_country,
+//       p_postal_code,
+//       p_id_document,
+//       p_tax_document
+//     ]
+//           };
 
 
-//         return this.utility.response.init(  res,  true,  "Facility created successfully",  { result: result.rows }   );
+//     // const values = [
+//     //   p_org_id,
+//     //   p_name,
+//     //   p_type,
+//     //   p_industry,
+//     //   p_registration_number,
+//     //   p_admin_name,
+//     //   p_admin_email,
+//     //   p_admin_phone,
+//     //   p_address_line1,
+//     //   p_city,
+//     //   p_state,
+//     //   p_country,
+//     //   p_postal_code,
+//     //   p_office_mail,
+//     //   p_office_phone,
+//     //   p_id_document,
+//     //   p_tax_document
+//     // ];
 
-//       } catch (err) {
-//         console.error("createFacility error:", err);
-//         return this.utility.response.init(res, false, "Internal server error");
-//       }
+//     const result = await this.utility.sql.query(query);
+
+//     console.log(result)
+
+//     if (!result.rows || result.rows.length === 0) {
+//       return this.utility.response.init(res, false, "No response from database", {}, 500);
+//     }
+
+//     return this.utility.response.init(
+//       res,
+//       true,
+//       "Facility created successfully ✅",
+//       { facility: result.rows[0] }
+//     );
+
+//   } catch (err) {
+//     console.error("createFacility error:", err);
+//     return this.utility.response.init(res, false, "Internal server error");
 //   }
+// };
+
 
 
 createNewFacility = async (req, res) => {
-  try {  
+  try {
+     
     const {
       p_org_id,
       p_facility_name,
@@ -142,65 +192,52 @@ createNewFacility = async (req, res) => {
       p_city,
       p_state,
       p_country,
-      p_postal_code,
-      p_id_document,
-      p_tax_document
-      
-      // p_name,
-      // p_type,
-      // p_industry,
-      // p_registration_number,
-      // p_office_mail,
-      // p_office_phone,
-
+      p_postal_code
     } = req.body;
-  
-    const query =  {
-    text : `SELECT * FROM public.create_new_facility( 
-            $1, $2, $3, $4, $5,
-            $6, $7, $8, $9, $10,
-            $11, $12, $13 )`,
-    values : [
-      p_org_id,
-      p_facility_name,
-      p_gst_number,
-      p_admin_name,
-      p_admin_email,
-      p_admin_phone,
-      p_address_line1,
-      p_city,
-      p_state,
-      p_country,
-      p_postal_code,
-      p_id_document,
-      p_tax_document
-    ]
-          };
 
+    let p_id_document_url = null;
+    let p_tax_document_url = null;
 
-    // const values = [
-    //   p_org_id,
-    //   p_name,
-    //   p_type,
-    //   p_industry,
-    //   p_registration_number,
-    //   p_admin_name,
-    //   p_admin_email,
-    //   p_admin_phone,
-    //   p_address_line1,
-    //   p_city,
-    //   p_state,
-    //   p_country,
-    //   p_postal_code,
-    //   p_office_mail,
-    //   p_office_phone,
-    //   p_id_document,
-    //   p_tax_document
-    // ];
+    // ✅ Upload p_id_document if exists
+    if (req.files?.p_id_document?.length > 0) {
+      const uploadRes = await cloudinary.uploader.upload(
+        req.files.p_id_document[0].path
+      );
+      p_id_document_url = uploadRes.secure_url;
+    }
+
+    // ✅ Upload p_tax_document if exists
+    if (req.files?.p_tax_document?.length > 0) {
+      const uploadRes = await cloudinary.uploader.upload(
+        req.files.p_tax_document[0].path
+      );
+      p_tax_document_url = uploadRes.secure_url;
+    }
+
+    const query = {
+      text: `SELECT * FROM public.create_new_facility( 
+              $1, $2, $3, $4, $5,
+              $6, $7, $8, $9, $10,
+              $11, $12, $13
+            )`,
+      values: [
+        p_org_id,
+        p_facility_name,
+        p_gst_number,
+        p_admin_name,
+        p_admin_email,
+        p_admin_phone,
+        p_address_line1,
+        p_city,
+        p_state,
+        p_country,
+        p_postal_code,
+        p_id_document_url,   //  Cloudinary URL
+        p_tax_document_url   //  Cloudinary URL
+      ]
+    };
 
     const result = await this.utility.sql.query(query);
-
-    console.log(result)
 
     if (!result.rows || result.rows.length === 0) {
       return this.utility.response.init(res, false, "No response from database", {}, 500);
@@ -209,7 +246,7 @@ createNewFacility = async (req, res) => {
     return this.utility.response.init(
       res,
       true,
-      "Facility created successfully ✅",
+      "Facility created successfully ",
       { facility: result.rows[0] }
     );
 
@@ -218,7 +255,6 @@ createNewFacility = async (req, res) => {
     return this.utility.response.init(res, false, "Internal server error");
   }
 };
-
 
 
 

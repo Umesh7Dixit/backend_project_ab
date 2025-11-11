@@ -7,6 +7,7 @@ const _projectActivities = require('./modules/projectActivities.js');
 const _taskComments = require('./modules/taskComments.js');
 const validationSchemas = require('./middlewares/validationSchemas.js');
 const ValidationMiddleware = require('./middlewares/validate.js');
+const upload = require('./middlewares/upload.js');
 const _templates = require('./modules/templates.js');
 // const _anomalyFlags = require('./modules/anomalyFlags.js');
 
@@ -279,6 +280,10 @@ utility.app.post('/project/save-activity-config',
 utility.app.post('/createNewFacility',
   // utility.authenticateToken,
   // validation.validate(validationSchemas.saveProjectActivityConfiguration),
+    upload.fields([
+    { name: "p_id_document", maxCount: 1 },
+    { name: "p_tax_document", maxCount: 1 }
+  ]),
   facilities.createNewFacility
 );
 
