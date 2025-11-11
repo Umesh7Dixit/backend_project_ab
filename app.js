@@ -1,0 +1,315 @@
+const _utility              = require('./modules/utility.js');
+// const _common               = require('./modules/common.js');
+const _dashboard            = require('./modules/dashboard.js');
+const _register             = require('./modules/registeruser.js');
+const _facilities = require('./modules/facilities.js');
+const _projectActivities = require('./modules/projectActivities.js');
+const _taskComments = require('./modules/taskComments.js');
+const validationSchemas = require('./middlewares/validationSchemas.js');
+const ValidationMiddleware = require('./middlewares/validate.js');
+const _templates = require('./modules/templates.js');
+// const _anomalyFlags = require('./modules/anomalyFlags.js');
+
+const cors = require('cors');
+
+const utility               = new _utility();
+
+// Validation
+const validation = ValidationMiddleware(utility);
+
+const register              = new _register(utility);
+const facilities = new _facilities(utility);
+const projectActivities = new _projectActivities(utility);
+const taskComments = new _taskComments(utility);
+const templates = new _templates(utility);
+// const anomalyFlags = new _anomalyFlags(utility);
+ 
+const compression = require('compression');
+utility.app.use(compression());
+
+const helmet = require('helmet');
+utility.app.use(helmet());
+const bodyParser = require('body-parser');
+
+
+utility.app.use(utility.express.json())
+utility.app.use(bodyParser.json());
+utility.app.use(bodyParser.json({ limit: '100mb' }));    
+utility.app.use(bodyParser.urlencoded({ limit: '100mb', extended: true }));
+// utility.app.use(utility.bodyParser.json());
+
+
+
+// utility.app.use(cors({
+//   origin: '*',
+//   methods: ['GET', 'POST'],
+//   allowedHeaders: ['Content-Type', 'Authorization']
+// }));
+
+utility.app.use(cors({
+  origin: [ process.env.FRONTEND_URL, "http://localhost:3000" ],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true  
+}));
+
+ 
+
+
+const dotenv = require('dotenv');
+
+
+if (process.env.NODE_ENV === 'production') {
+  dotenv.config({ path: '.env.production' });
+} else {
+  dotenv.config({ path: '.env.local' });
+}
+ 
+
+
+// Old 
+// utility.app.post('/UserLogin' ,                                                                 register.UserLogin);
+
+// New
+
+// utility.app.post('/user/login', 
+//   validation.validate(validationSchemas.login),
+//   register.UserLogin
+// );
+
+utility.app.post('/user/login', (req, res, next) => {
+  next();
+}, 
+  validation.validate(validationSchemas.login),
+  (req, res, next) => {
+    next();
+  },
+  register.UserLogin
+);
+
+
+utility.app.post('/user/logout', 
+  utility.authenticateToken,
+  register.UserLogout
+);
+
+utility.app.post('/user/update-password', 
+  utility.authenticateToken,
+  validation.validate(validationSchemas.updatePassword),
+  register.UpdateUserPassword
+);
+
+utility.app.post('/auth/register', 
+  validation.validate(validationSchemas.registerUser),
+  register.RegisterUser
+);
+// Facilities
+utility.app.get('/facilities/search', 
+  utility.authenticateToken,
+  facilities.searchFacilitiesByUser
+);
+
+utility.app.get('/facilities/accessible', 
+  utility.authenticateToken,
+  validation.validate(validationSchemas.getAccessibleFacilities, 'query'),
+  facilities.GetAccessibleFacilities
+);
+
+// Project Activities
+utility.app.post('/project/add', 
+  utility.authenticateToken,
+  validation.validate(validationSchemas.addProjectActivity),
+  projectActivities.AddActivityToProject
+);
+
+utility.app.post('/project/check-unresolved-flags', 
+  utility.authenticateToken,
+  validation.validate(validationSchemas.checkUnresolvedFlags),
+  projectActivities.CheckUnresolvedFlags
+);
+
+utility.app.post('/project/create-tasks',
+  utility.authenticateToken,
+  validation.validate(validationSchemas.createProjectRequest),
+  projectActivities.CreateProjectRequest
+);
+
+utility.app.post('/project/create', 
+  utility.authenticateToken,
+  validation.validate(validationSchemas.createProject),
+  projectActivities.CreateProject
+);
+
+utility.app.put('/project/customize-scopes', 
+  utility.authenticateToken,
+  validation.validate(validationSchemas.customizeActiveScopes),
+  projectActivities.CustomizeActiveScopes
+);
+
+utility.app.get('/project/data-collection-sheet/scope', 
+  utility.authenticateToken,
+  validation.validate(validationSchemas.getDataCollectionSheetForScope, 'query'),
+  projectActivities.GetDataCollectionSheetForScope
+);
+
+utility.app.get('/activities/subcategory', 
+  utility.authenticateToken,
+  validation.validate(validationSchemas.getActivitiesForSubcategory, 'query'),
+  projectActivities.GetActivitiesForSubcategory
+);
+
+utility.app.get('/user/requests', 
+  utility.authenticateToken,
+  validation.validate(validationSchemas.getAllRequestsForUser),
+  projectActivities.GetAllRequestsForUser
+);
+
+utility.app.get('/users/assignable', 
+  utility.authenticateToken,
+  validation.validate(validationSchemas.getAssignableUsers),
+  projectActivities.GetAssignableUsers
+);
+
+utility.app.get('/project/export-data', 
+  utility.authenticateToken,
+  validation.validate(validationSchemas.getDataForExport, 'query'),
+  projectActivities.GetDataForExport
+);
+
+utility.app.get('/categories/main', 
+  utility.authenticateToken,
+  validation.validate(validationSchemas.getMainCategoriesForScopeAndSource, 'query'),
+  projectActivities.GetMainCategoriesForScopeAndSource
+);
+
+utility.app.get('/project/preview-data/scope', 
+  utility.authenticateToken,
+  validation.validate(validationSchemas.getPreviewDataForScope, 'query'),
+  projectActivities.GetPreviewDataForScope
+);
+
+utility.app.get('/activities/selection1-options', 
+  utility.authenticateToken,
+  validation.validate(validationSchemas.getSelection1ForActivity, 'query'),
+  projectActivities.GetSelection1ForActivity
+);
+
+utility.app.get('/activities/selection2-options', 
+  utility.authenticateToken,
+  validation.validate(validationSchemas.getSelection2ForSelection1, 'query'),
+  projectActivities.GetSelection2ForSelection1
+);
+
+utility.app.get('/categories/subcategories', 
+  utility.authenticateToken,
+  validation.validate(validationSchemas.getSubcategoriesForMainCategory, 'query'),
+  projectActivities.GetSubcategoriesForMainCategory
+);
+
+utility.app.post('/projects/initialize', 
+  utility.authenticateToken,
+  validation.validate(validationSchemas.initializeNewProject),
+  projectActivities.InitializeNewProject
+);
+
+utility.app.post('/flags/ignore',
+  utility.authenticateToken,
+  validation.validate(validationSchemas.resolveAnomalyFlagAsIgnored),
+  projectActivities.ResolveAnomalyFlagAsIgnored
+);
+
+
+
+utility.app.post('/validations/run', 
+  utility.authenticateToken,
+  validation.validate(validationSchemas.runAllValidationsForScope),
+  projectActivities.RunAllValidationsForScope
+);
+
+utility.app.post('/activities/batch', 
+  utility.authenticateToken,
+  validation.validate(validationSchemas.upsertActivityDataBatch),
+  projectActivities.UpsertActivityDataBatch
+);
+
+// Task Comments
+utility.app.post('/task-comments/add', 
+  utility.authenticateToken,
+  validation.validate(validationSchemas.addTaskComment),
+  taskComments.AddCommentToTask
+);
+
+utility.app.get('/request/thread', 
+  utility.authenticateToken,
+  validation.validate(validationSchemas.getRequestThreadDetails, 'query'),
+  taskComments.GetRequestThreadDetails
+);
+
+// Templates
+utility.app.post('/templates/create-custom', 
+  utility.authenticateToken,
+  validation.validate(validationSchemas.createCustomTemplate),
+  templates.CreateCustomTemplate
+);
+
+utility.app.get('/templates/details', 
+  utility.authenticateToken,
+  validation.validate(validationSchemas.getTemplateDetailsById, 'query'),
+  templates.GetTemplateDetailsById
+);
+
+utility.app.get('/templates/list', 
+  utility.authenticateToken,
+  validation.validate(validationSchemas.getTemplatesForUser, 'query'),
+  templates.GetTemplatesForUser
+);
+
+utility.app.post('/project/apply-template',
+  utility.authenticateToken,
+  validation.validate(validationSchemas.applyTemplateToProject),
+  projectActivities.ApplyTemplateToProject
+);
+
+utility.app.post('/project/save-activity-config',
+  utility.authenticateToken,
+  validation.validate(validationSchemas.saveProjectActivityConfiguration),
+  projectActivities.SaveProjectActivityConfiguration
+);
+
+utility.app.post('/createNewFacility',
+  // utility.authenticateToken,
+  // validation.validate(validationSchemas.saveProjectActivityConfiguration),
+  facilities.createNewFacility
+);
+
+
+utility.app.put('/templates/update',
+  utility.authenticateToken,
+  validation.validate(validationSchemas.updateExistingCustomTemplate),
+  templates.UpdateExistingCustomTemplate
+);
+
+
+
+
+// utility.app.post('/userlogout' ,                                    utility.authenticateToken,  register.userlogout);
+
+
+
+
+ 
+
+
+
+utility.app.get('/', (req, res) => {
+  res.send("Hello I am working");
+})
+
+utility.app.listen(utility.port, () => {
+  console.log(`Example app listening on port ${utility.port}`)
+})
+
+
+
+
+
