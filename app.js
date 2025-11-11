@@ -288,6 +288,24 @@ utility.app.post('/createNewFacility',
 );
 
 
+// _______________________________________________________________
+
+  //parameter :- 
+  // {
+//   "p_org_id": 5
+// }
+
+utility.app.post('/get_assignable_users_for_org',  
+  // utility.authenticateToken,
+  // validation.validate(validationSchemas.saveProjectActivityConfiguration),
+  projectActivities.get_assignable_users_for_org
+);
+
+// _______________________________________________________________
+
+
+
+
 utility.app.put('/templates/update',
   utility.authenticateToken,
   validation.validate(validationSchemas.updateExistingCustomTemplate),

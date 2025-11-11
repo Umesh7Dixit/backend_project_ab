@@ -962,7 +962,43 @@ class ProjectActivities {
     }
   };
 
+// search_assignable_users_for_project
 
+
+
+get_assignable_users_for_org = async (req, res) => {
+  try {
+     
+    const {
+      p_org_id,
+      
+    } = req.body;
+ 
+    const query = {
+      text: `SELECT * FROM get_assignable_users_for_org(  $1  )`,
+      values: [
+        p_org_id, 
+      ]
+    };
+
+    const result = await this.utility.sql.query(query);
+
+    if (!result.rows || result.rows.length === 0) {
+      return this.utility.response.init(res, false, "No response from database", {}, 500);
+    }
+
+    return this.utility.response.init(
+      res,
+      true,
+      "getting Users under Organisation  successfully ",
+      { facility: result.rows[0] }
+    );
+
+  } catch (err) {
+    console.error("createFacility error:", err);
+    return this.utility.response.init(res, false, "Internal server error");
+  }
+};
 
 }
 
