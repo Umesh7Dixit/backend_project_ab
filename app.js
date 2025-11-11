@@ -208,8 +208,8 @@ utility.app.get('/categories/subcategories',
 );
 
 utility.app.post('/projects/initialize', 
-  utility.authenticateToken,
-  validation.validate(validationSchemas.initializeNewProject),
+  // utility.authenticateToken,
+  // validation.validate(validationSchemas.initializeNewProject),
   projectActivities.InitializeNewProject
 );
 
@@ -259,9 +259,10 @@ utility.app.get('/templates/details',
   templates.GetTemplateDetailsById
 );
 
-utility.app.get('/templates/list', 
-  utility.authenticateToken,
-  validation.validate(validationSchemas.getTemplatesForUser, 'query'),
+// utility.app.get('/templates/list',  
+utility.app.post('/templates/list', 
+  // utility.authenticateToken,
+  // validation.validate(validationSchemas.getTemplatesForUser, 'query'),
   templates.GetTemplatesForUser
 );
 

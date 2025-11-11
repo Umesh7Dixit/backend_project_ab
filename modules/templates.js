@@ -95,14 +95,19 @@ class Templates {
     }
   };
 
+
   GetTemplatesForUser = async (req, res) => {
     try {
-      const { search_term } = req.query;
-      const user_id = req.user.userId; // From JWT token
+
+      // const { search_term } = req.query;
+      // const user_id = req.user.userId; // From JWT token
+
+      const {org_id , industry} = req.body
 
       const query = {
         text: 'SELECT * FROM get_templates_for_user($1, $2)',
-        values: [user_id, search_term || null]
+        // values: [user_id, search_term || null]
+        values: [org_id , industry || null]
       };
 
       const result = await this.utility.sql.query(query);

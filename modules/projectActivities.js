@@ -705,9 +705,11 @@ class ProjectActivities {
     }
   };
 
-  InitializeNewProject = async (req, res) => {
+
+  InitializeNewProject = async (req, res) => { 
     try {
-      const creator_user_id = req.user.userId; // From JWT token
+      // const creator_user_id = req.user.userId; // From JWT token
+      const creator_user_id = 4; // From JWT token
       const {
         facility_id,
         project_name,
@@ -721,7 +723,8 @@ class ProjectActivities {
         reporting_protocol,
         base_year,
         industry,
-        team_member_ids = []
+        // team_member_ids = []
+        team_assignments
       } = req.body;
 
       // Convert date strings to Date objects if they're strings
@@ -744,7 +747,8 @@ class ProjectActivities {
           reporting_protocol,
           base_year,
           industry,
-          team_member_ids
+          // team_member_ids
+          JSON.stringify(team_assignments)
         ]
       };
 
@@ -774,7 +778,8 @@ class ProjectActivities {
           facility_id,
           creator_user_id,
           industry,
-          team_members_added: team_member_ids.length,
+          // team_members_added: team_member_ids.length,
+          team_members_added: team_assignments.length,
           reporting_period: {
             start: reporting_period_start,
             end: reporting_period_end
@@ -965,19 +970,31 @@ class ProjectActivities {
 // search_assignable_users_for_project
 
 
-
+//get users based on org_id
 get_assignable_users_for_org = async (req, res) => {
   try {
      
     const {
-      p_org_id,
+      org_id
       
     } = req.body;
  
     const query = {
-      text: `SELECT * FROM get_assignable_users_for_org(  $1  )`,
+      // text: `SELECT * FROM get_assignable_users_for_org(  $1  )`,
+      // text: `SELECT * FROM users WHERE org_id = $1 OR role_id = 16`,
+      text: `SELECT 
+    u.user_id,
+    u.full_name,
+    r.role_name
+FROM users u
+LEFT JOIN roles r 
+    ON u.role_id = r.role_id
+WHERE 
+    u.org_id = $1
+    OR u.role_id = 16;
+`,
       values: [
-        p_org_id, 
+        org_id, 
       ]
     };
 
@@ -991,7 +1008,59 @@ get_assignable_users_for_org = async (req, res) => {
       res,
       true,
       "getting Users under Organisation  successfully ",
-      { facility: result.rows[0] }
+      { facility: result.rows }
+    );
+
+  } catch (err) {
+    console.error("createFacility error:", err);
+    return this.utility.response.init(res, false, "Internal server error");
+  }
+};
+
+
+
+
+
+
+get_templatesBy_parentID = async (req, res) => {
+  try {
+     
+    const {
+      org_id,
+      industry
+      
+    } = req.body;
+ 
+    const query = {
+      text: `SELECT t.*
+FROM templates t
+JOIN organisation o
+    ON t.org_id = o.org_id
+WHERE o.parent_org_id = (
+    SELECT parent_org_id 
+    FROM organisation 
+    WHERE org_id = $1   -- <-- send org_id here
+)
+AND t.industry = $2;     -- <-- send industry here
+
+`,
+      values: [
+        org_id, 
+        industry
+      ]
+    };
+
+    const result = await this.utility.sql.query(query);
+
+    if (!result.rows || result.rows.length === 0) {
+      return this.utility.response.init(res, false, "No response from database", {}, 500);
+    }
+
+    return this.utility.response.init(
+      res,
+      true,
+      "getting Users under Organisation  successfully ",
+      { facility: result.rows }
     );
 
   } catch (err) {
