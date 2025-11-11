@@ -247,8 +247,8 @@ getorg_name_and_id = async (req, res) => {
     return this.utility.response.init(
       res,
       true,
-      "Facility created successfully ✅",
-      { facility: result.fields }
+      "Organisation getting successfully ✅",
+      { facility: result.rows }
     );
 
   } catch (err) {
