@@ -154,12 +154,7 @@ createNewFacility = async (req, res) => {
       // p_office_phone,
 
     } = req.body;
-
-    // ✅ Basic validation
-    // if (!p_org_id || !p_name) {
-    //   return this.utility.response.init(res, false, "p_org_id and p_name are required");
-    // }
-
+  
     const query =  {
     text : `SELECT * FROM public.create_new_facility( 
             $1, $2, $3, $4, $5,
@@ -223,6 +218,46 @@ createNewFacility = async (req, res) => {
     return this.utility.response.init(res, false, "Internal server error");
   }
 };
+
+
+
+
+getorg_name_and_id = async (req, res) => {
+  try {  
+    const {
+      parent_org_id,
+    } = req.body;
+  
+    const query =  {
+    text : 'SELECT org_id,org_name from organisation Where parent_org_id = $1',
+    values : [
+      parent_org_id,
+    ]
+          };
+
+
+    const result = await this.utility.sql.query(query);
+
+    console.log(result)
+
+    if (!result.fields || result.fields.length === 0) {
+      return this.utility.response.init(res, false, "No response from database", {}, 500);
+    }
+
+    return this.utility.response.init(
+      res,
+      true,
+      "Facility created successfully ✅",
+      { facility: result.fields }
+    );
+
+  } catch (err) {
+    console.error("createFacility error:", err);
+    return this.utility.response.init(res, false, "Internal server error");
+  }
+};
+
+
 
 
 

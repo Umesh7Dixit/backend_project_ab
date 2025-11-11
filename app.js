@@ -292,6 +292,15 @@ utility.app.put('/templates/update',
 
 
 
+
+utility.app.post('/getorg_name_and_id',
+  // utility.authenticateToken,
+  // validation.validate(validationSchemas.saveProjectActivityConfiguration),
+  facilities.getorg_name_and_id
+);
+
+
+
 // utility.app.post('/userlogout' ,                                    utility.authenticateToken,  register.userlogout);
 
 
