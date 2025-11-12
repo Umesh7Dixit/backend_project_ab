@@ -253,6 +253,59 @@ utility.app.post('/templates/create-custom',
   templates.CreateCustomTemplate
 );
 
+// temp1
+utility.app.post('/templates/apply_template_to_project', 
+  // utility.authenticateToken,
+  // validation.validate(validationSchemas.createCustomTemplate),
+  templates.apply_template_to_project
+);
+
+// temp2
+utility.app.post('/templates/get_template_details_by_id', 
+  // utility.authenticateToken,
+  // validation.validate(validationSchemas.createCustomTemplate),
+  templates.get_template_details_by_id
+);
+
+//temp3
+utility.app.post('/get_subcategories_for_main_category', 
+  // utility.authenticateToken,
+  // validation.validate(validationSchemas.createCustomTemplate),
+  templates.get_subcategories_for_main_category
+);
+
+//temp4
+utility.app.post('/get_activities_for_subcategory', 
+  // utility.authenticateToken,
+  // validation.validate(validationSchemas.createCustomTemplate),
+  templates.get_activities_for_subcategory
+);
+
+//temp5
+utility.app.post('/get_selection1_for_activity', 
+  // utility.authenticateToken,
+  // validation.validate(validationSchemas.createCustomTemplate),
+  templates.get_selection1_for_activity
+);
+
+//temp6
+utility.app.post('/get_selection2_for_selection1', 
+  // utility.authenticateToken,
+  // validation.validate(validationSchemas.createCustomTemplate),
+  templates.get_selection2_for_selection1
+);
+
+//temp7
+utility.app.post('/get_emission_factor_for_selection', 
+  // utility.authenticateToken,
+  // validation.validate(validationSchemas.createCustomTemplate),
+  templates.get_emission_factor_for_selection
+);
+
+
+
+
+
 utility.app.get('/templates/details', 
   utility.authenticateToken,
   validation.validate(validationSchemas.getTemplateDetailsById, 'query'),
