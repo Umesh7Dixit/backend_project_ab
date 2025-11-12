@@ -628,6 +628,56 @@ class Templates {
               }
     };
 
+
+
+
+    create_custom_template_from_scratch = async(req,res) => {
+             try {
+          
+                const {p_creator_user_id , p_template_name,  p_description,  p_industry,  p_template_payload } = req.body 
+
+                const query = {
+                  text: 'SELECT * FROM  create_custom_template_from_scratch($1,$2,$3,$4,$5)',
+                  values: [p_creator_user_id , p_template_name,  p_description,  p_industry,  p_template_payload ]
+                };
+
+                const result = await this.utility.sql.query(query);
+                
+                if (!result.rows) {
+                  return this.utility.response.init(res, false, "No response from database", {
+                    error: "DATABASE_ERROR"
+                  }, 500);
+                }
+
+                return this.utility.response.init(
+                  res,
+                  true,
+                  "save_project_activity_configuration  successfully",
+                  {
+                    templates: result.rows,
+                    count: result.rows.length
+                  }
+                );
+
+              } catch (error) {
+                console.error('Error fetching templates:', error);
+                return this.utility.response.init(
+                  res, 
+                  false, 
+                  "Internal server error while fetching templates", 
+                  {
+                    error: "INTERNAL_SERVER_ERROR",
+                    details: error.message
+                  }, 
+                  500
+                );
+              }
+    }
+
+
+
+
+
 }
 
 module.exports = Templates;
