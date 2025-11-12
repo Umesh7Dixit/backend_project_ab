@@ -535,6 +535,51 @@ class Templates {
               }
     };
 
+
+
+    get_template_usage_percentage = async (req, res) => {
+              try {
+          
+                const {p_template_id , p_parent_org_id,p_industry} = req.body 
+
+                const query = {
+                  text: 'SELECT * FROM  get_template_usage_percentage($1,$2,$3)',
+                  values: [p_template_id , p_parent_org_id,p_industry]
+                };
+
+                const result = await this.utility.sql.query(query);
+                
+                if (!result.rows) {
+                  return this.utility.response.init(res, false, "No response from database", {
+                    error: "DATABASE_ERROR"
+                  }, 500);
+                }
+
+                return this.utility.response.init(
+                  res,
+                  true,
+                  "Templates retrieved successfully",
+                  {
+                    templates: result.rows,
+                    count: result.rows.length
+                  }
+                );
+
+              } catch (error) {
+                console.error('Error fetching templates:', error);
+                return this.utility.response.init(
+                  res, 
+                  false, 
+                  "Internal server error while fetching templates", 
+                  {
+                    error: "INTERNAL_SERVER_ERROR",
+                    details: error.message
+                  }, 
+                  500
+                );
+              }
+    };
+
 }
 
 module.exports = Templates;

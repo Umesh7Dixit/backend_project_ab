@@ -302,6 +302,13 @@ utility.app.post('/get_emission_factor_for_selection',
   templates.get_emission_factor_for_selection
 );
 
+//temp8
+utility.app.post('/get_template_usage_percentage', 
+  // utility.authenticateToken,
+  // validation.validate(validationSchemas.createCustomTemplate),
+  templates.get_template_usage_percentage
+);
+
 
 
 
