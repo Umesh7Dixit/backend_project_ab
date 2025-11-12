@@ -310,6 +310,14 @@ utility.app.post('/get_template_usage_percentage',
 );
 
 
+//temp9
+utility.app.post('/save_project_activity_configuration', 
+  // utility.authenticateToken,
+  // validation.validate(validationSchemas.createCustomTemplate),
+  templates.save_project_activity_configuration
+);
+
+
 
 
 
