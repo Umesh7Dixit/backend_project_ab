@@ -390,8 +390,6 @@ class Templates {
   };
 
 
-
-
   get_selection1_for_activity = async (req, res) => {
     try {
 
