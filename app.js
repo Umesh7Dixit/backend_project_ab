@@ -318,6 +318,14 @@ utility.app.post('/save_project_activity_configuration',
 );
 
 
+//temp10
+utility.app.post('/create_custom_template_from_scratch', 
+  // utility.authenticateToken,
+  // validation.validate(validationSchemas.createCustomTemplate),
+  templates.create_custom_template_from_scratch
+);
+
+
 
 
 
