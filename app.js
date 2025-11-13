@@ -325,6 +325,26 @@ utility.app.post('/create_custom_template_from_scratch',
   templates.create_custom_template_from_scratch
 );
 
+//temp11
+utility.app.post('/get_data_collection_sheet_for_scope', 
+  // utility.authenticateToken,
+  // validation.validate(validationSchemas.createCustomTemplate),
+  templates.get_data_collection_sheet_for_scope
+);
+
+
+
+//temp12
+utility.app.post('/getUnitById', 
+  // utility.authenticateToken,
+  // validation.validate(validationSchemas.createCustomTemplate),
+  templates.getUnitById
+);
+
+
+
+
+
 
 
 
