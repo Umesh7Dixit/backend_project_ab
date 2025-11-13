@@ -119,7 +119,7 @@ class ProjectActivities {
       };
 
       const result = await this.utility.sql.query(query);
-      
+
       if (!result.rows || result.rows.length === 0) {
         return this.utility.response.init(res, false, "No response from database", {
           error: "DATABASE_ERROR"
@@ -168,7 +168,7 @@ class ProjectActivities {
         base_year,
         team_member_ids
       } = req.body;
-      
+
       const creator_user_id = req.user.userId; // From JWT token
 
       // Call the PostgreSQL function
@@ -192,7 +192,7 @@ class ProjectActivities {
       };
 
       const result = await this.utility.sql.query(query);
-      
+
       if (!result.rows || result.rows.length === 0) {
         return this.utility.response.init(res, false, "No response from database", {
           error: "DATABASE_ERROR"
@@ -241,7 +241,7 @@ class ProjectActivities {
       };
 
       const result = await this.utility.sql.query(query);
-      
+
       if (!result.rows || result.rows.length === 0) {
         return this.utility.response.init(res, false, "No response from database", {
           error: "DATABASE_ERROR"
@@ -283,7 +283,7 @@ class ProjectActivities {
       };
 
       const result = await this.utility.sql.query(query);
-      
+
       if (!result.rows) {
         return this.utility.response.init(res, false, "No response from database", {
           error: "DATABASE_ERROR"
@@ -303,13 +303,13 @@ class ProjectActivities {
     } catch (error) {
       console.error('Error fetching activities:', error);
       return this.utility.response.init(
-        res, 
-        false, 
-        "Internal server error while fetching activities", 
+        res,
+        false,
+        "Internal server error while fetching activities",
         {
           error: "INTERNAL_SERVER_ERROR",
           details: error.message
-        }, 
+        },
         500
       );
     }
@@ -327,7 +327,7 @@ class ProjectActivities {
       };
 
       const result = await this.utility.sql.query(query);
-      
+
       if (!result.rows) {
         return this.utility.response.init(res, false, "No response from database", {
           error: "DATABASE_ERROR"
@@ -347,13 +347,13 @@ class ProjectActivities {
     } catch (error) {
       console.error('Error fetching user requests:', error);
       return this.utility.response.init(
-        res, 
-        false, 
-        "Internal server error while fetching user requests", 
+        res,
+        false,
+        "Internal server error while fetching user requests",
         {
           error: "INTERNAL_SERVER_ERROR",
           details: error.message
-        }, 
+        },
         500
       );
     }
@@ -369,7 +369,7 @@ class ProjectActivities {
       };
 
       const result = await this.utility.sql.query(query);
-      
+
       if (!result.rows) {
         return this.utility.response.init(res, false, "No response from database", {
           error: "DATABASE_ERROR"
@@ -389,13 +389,13 @@ class ProjectActivities {
     } catch (error) {
       console.error('Error fetching assignable users:', error);
       return this.utility.response.init(
-        res, 
-        false, 
-        "Internal server error while fetching assignable users", 
+        res,
+        false,
+        "Internal server error while fetching assignable users",
         {
           error: "INTERNAL_SERVER_ERROR",
           details: error.message
-        }, 
+        },
         500
       );
     }
@@ -411,7 +411,7 @@ class ProjectActivities {
       };
 
       const result = await this.utility.sql.query(query);
-      
+
       if (!result.rows) {
         return this.utility.response.init(res, false, "No response from database", {
           error: "DATABASE_ERROR"
@@ -436,13 +436,13 @@ class ProjectActivities {
     } catch (error) {
       console.error('Error fetching data collection sheet:', error);
       return this.utility.response.init(
-        res, 
-        false, 
-        "Internal server error while fetching data collection sheet", 
+        res,
+        false,
+        "Internal server error while fetching data collection sheet",
         {
           error: "INTERNAL_SERVER_ERROR",
           details: error.message
-        }, 
+        },
         500
       );
     }
@@ -458,7 +458,7 @@ class ProjectActivities {
       };
 
       const result = await this.utility.sql.query(query);
-      
+
       if (!result.rows) {
         return this.utility.response.init(res, false, "No response from database", {
           error: "DATABASE_ERROR"
@@ -478,59 +478,59 @@ class ProjectActivities {
     } catch (error) {
       console.error('Error fetching export data:', error);
       return this.utility.response.init(
-        res, 
-        false, 
-        "Internal server error while fetching export data", 
+        res,
+        false,
+        "Internal server error while fetching export data",
         {
           error: "INTERNAL_SERVER_ERROR",
           details: error.message
-        }, 
+        },
         500
       );
     }
   };
 
-    GetMainCategoriesForScopeAndSource = async (req, res) => {
-      try {
-        const { scope, source } = req.query;
+  GetMainCategoriesForScopeAndSource = async (req, res) => {
+    try {
+      const { scope, source } = req.query;
 
-        const query = {
-          text: 'SELECT * FROM get_main_categories_for_scope_and_source($1, $2)',
-          values: [scope, source]
-        };
+      const query = {
+        text: 'SELECT * FROM get_main_categories_for_scope_and_source($1, $2)',
+        values: [scope, source]
+      };
 
-        const result = await this.utility.sql.query(query);
-        
-        if (!result.rows) {
-          return this.utility.response.init(res, false, "No response from database", {
-            error: "DATABASE_ERROR"
-          }, 500);
-        }
+      const result = await this.utility.sql.query(query);
 
-        return this.utility.response.init(
-          res,
-          true,
-          "Main categories retrieved successfully",
-          {
-            categories: result.rows,
-            count: result.rows.length
-          }
-        );
-
-      } catch (error) {
-        console.error('Error fetching main categories:', error);
-        return this.utility.response.init(
-          res, 
-          false, 
-          "Internal server error while fetching main categories", 
-          {
-            error: "INTERNAL_SERVER_ERROR",
-            details: error.message
-          }, 
-          500
-        );
+      if (!result.rows) {
+        return this.utility.response.init(res, false, "No response from database", {
+          error: "DATABASE_ERROR"
+        }, 500);
       }
-    };
+
+      return this.utility.response.init(
+        res,
+        true,
+        "Main categories retrieved successfully",
+        {
+          categories: result.rows,
+          count: result.rows.length
+        }
+      );
+
+    } catch (error) {
+      console.error('Error fetching main categories:', error);
+      return this.utility.response.init(
+        res,
+        false,
+        "Internal server error while fetching main categories",
+        {
+          error: "INTERNAL_SERVER_ERROR",
+          details: error.message
+        },
+        500
+      );
+    }
+  };
 
   GetPreviewDataForScope = async (req, res) => {
     try {
@@ -542,7 +542,7 @@ class ProjectActivities {
       };
 
       const result = await this.utility.sql.query(query);
-      
+
       if (!result.rows) {
         return this.utility.response.init(res, false, "No response from database", {
           error: "DATABASE_ERROR"
@@ -562,13 +562,13 @@ class ProjectActivities {
     } catch (error) {
       console.error('Error fetching preview data:', error);
       return this.utility.response.init(
-        res, 
-        false, 
-        "Internal server error while fetching preview data", 
+        res,
+        false,
+        "Internal server error while fetching preview data",
         {
           error: "INTERNAL_SERVER_ERROR",
           details: error.message
-        }, 
+        },
         500
       );
     }
@@ -584,7 +584,7 @@ class ProjectActivities {
       };
 
       const result = await this.utility.sql.query(query);
-      
+
       if (!result.rows) {
         return this.utility.response.init(res, false, "No response from database", {
           error: "DATABASE_ERROR"
@@ -604,13 +604,13 @@ class ProjectActivities {
     } catch (error) {
       console.error('Error fetching selection 1 options:', error);
       return this.utility.response.init(
-        res, 
-        false, 
-        "Internal server error while fetching selection 1 options", 
+        res,
+        false,
+        "Internal server error while fetching selection 1 options",
         {
           error: "INTERNAL_SERVER_ERROR",
           details: error.message
-        }, 
+        },
         500
       );
     }
@@ -618,11 +618,11 @@ class ProjectActivities {
 
   GetSelection2ForSelection1 = async (req, res) => {
     try {
-      const { 
-        main_category_id, 
-        subcategory_name, 
-        activity_name, 
-        selection_1_name 
+      const {
+        main_category_id,
+        subcategory_name,
+        activity_name,
+        selection_1_name
       } = req.query;
 
       const query = {
@@ -631,7 +631,7 @@ class ProjectActivities {
       };
 
       const result = await this.utility.sql.query(query);
-      
+
       if (!result.rows) {
         return this.utility.response.init(res, false, "No response from database", {
           error: "DATABASE_ERROR"
@@ -651,13 +651,13 @@ class ProjectActivities {
     } catch (error) {
       console.error('Error fetching selection 2 options:', error);
       return this.utility.response.init(
-        res, 
-        false, 
-        "Internal server error while fetching selection 2 options", 
+        res,
+        false,
+        "Internal server error while fetching selection 2 options",
         {
           error: "INTERNAL_SERVER_ERROR",
           details: error.message
-        }, 
+        },
         500
       );
     }
@@ -673,7 +673,7 @@ class ProjectActivities {
       };
 
       const result = await this.utility.sql.query(query);
-      
+
       if (!result.rows) {
         return this.utility.response.init(res, false, "No response from database", {
           error: "DATABASE_ERROR"
@@ -693,20 +693,20 @@ class ProjectActivities {
     } catch (error) {
       console.error('Error fetching subcategories:', error);
       return this.utility.response.init(
-        res, 
-        false, 
-        "Internal server error while fetching subcategories", 
+        res,
+        false,
+        "Internal server error while fetching subcategories",
         {
           error: "INTERNAL_SERVER_ERROR",
           details: error.message
-        }, 
+        },
         500
       );
     }
   };
 
 
-  InitializeNewProject = async (req, res) => { 
+  InitializeNewProject = async (req, res) => {
     try {
       // const creator_user_id = req.user.userId; // From JWT token
       const creator_user_id = 4; // From JWT token
@@ -753,7 +753,7 @@ class ProjectActivities {
       };
 
       const result = await this.utility.sql.query(query);
-      
+
       if (!result.rows || result.rows.length === 0) {
         return this.utility.response.init(res, false, "Project creation failed", {
           error: "PROJECT_CREATION_FAILED"
@@ -791,13 +791,13 @@ class ProjectActivities {
     } catch (error) {
       console.error('Error creating project:', error);
       return this.utility.response.init(
-        res, 
-        false, 
-        error.message.includes('overlapping') ? error.message : "Internal server error while creating project", 
+        res,
+        false,
+        error.message.includes('overlapping') ? error.message : "Internal server error while creating project",
         {
           error: error.message.includes('overlapping') ? "OVERLAPPING_PROJECT" : "INTERNAL_SERVER_ERROR",
           details: error.message
-        }, 
+        },
         error.message.includes('overlapping') ? 400 : 500
       );
     }
@@ -837,7 +837,7 @@ class ProjectActivities {
       };
 
       const result = await this.utility.sql.query(query);
-      
+
       if (!result.rows || result.rows.length === 0) {
         return this.utility.response.init(res, false, "Failed to run validations", {
           error: "VALIDATION_ERROR"
@@ -860,13 +860,13 @@ class ProjectActivities {
     } catch (error) {
       console.error('Error running validations:', error);
       return this.utility.response.init(
-        res, 
-        false, 
-        "Internal server error while running validations", 
+        res,
+        false,
+        "Internal server error while running validations",
         {
           error: "INTERNAL_SERVER_ERROR",
           details: error.message
-        }, 
+        },
         500
       );
     }
@@ -890,7 +890,7 @@ class ProjectActivities {
       };
 
       const result = await this.utility.sql.query(query);
-      
+
       if (!result.rows || result.rows.length === 0) {
         return this.utility.response.init(res, false, "Failed to save data batch", {
           error: "SAVE_FAILED"
@@ -913,13 +913,13 @@ class ProjectActivities {
     } catch (error) {
       console.error('Error saving activity data batch:', error);
       return this.utility.response.init(
-        res, 
-        false, 
-        "Internal server error while saving data batch", 
+        res,
+        false,
+        "Internal server error while saving data batch",
         {
           error: "INTERNAL_SERVER_ERROR",
           details: error.message
-        }, 
+        },
         500
       );
     }
@@ -967,22 +967,22 @@ class ProjectActivities {
     }
   };
 
-// search_assignable_users_for_project
+  // search_assignable_users_for_project
 
 
-//get users based on org_id
-get_assignable_users_for_org = async (req, res) => {
-  try {
-     
-    const {
-      org_id
-      
-    } = req.body;
- 
-    const query = {
-      // text: `SELECT * FROM get_assignable_users_for_org(  $1  )`,
-      // text: `SELECT * FROM users WHERE org_id = $1 OR role_id = 16`,
-      text: `SELECT 
+  //get users based on org_id
+  get_assignable_users_for_org = async (req, res) => {
+    try {
+
+      const {
+        org_id
+
+      } = req.body;
+
+      const query = {
+        // text: `SELECT * FROM get_assignable_users_for_org(  $1  )`,
+        // text: `SELECT * FROM users WHERE org_id = $1 OR role_id = 16`,
+        text: `SELECT 
     u.user_id,
     u.full_name,
     r.role_name
@@ -993,46 +993,46 @@ WHERE
     u.org_id = $1
     OR u.role_id = 16;
 `,
-      values: [
-        org_id, 
-      ]
-    };
+        values: [
+          org_id,
+        ]
+      };
 
-    const result = await this.utility.sql.query(query);
+      const result = await this.utility.sql.query(query);
 
-    if (!result.rows || result.rows.length === 0) {
-      return this.utility.response.init(res, false, "No response from database", {}, 500);
+      if (!result.rows || result.rows.length === 0) {
+        return this.utility.response.init(res, false, "No response from database", {}, 500);
+      }
+
+      return this.utility.response.init(
+        res,
+        true,
+        "getting Users under Organisation  successfully ",
+        { facility: result.rows }
+      );
+
+    } catch (err) {
+      console.error("createFacility error:", err);
+      return this.utility.response.init(res, false, "Internal server error");
     }
-
-    return this.utility.response.init(
-      res,
-      true,
-      "getting Users under Organisation  successfully ",
-      { facility: result.rows }
-    );
-
-  } catch (err) {
-    console.error("createFacility error:", err);
-    return this.utility.response.init(res, false, "Internal server error");
-  }
-};
+  };
 
 
 
 
 
 
-get_templatesBy_parentID = async (req, res) => {
-  try {
-     
-    const {
-      org_id,
-      industry
-      
-    } = req.body;
- 
-    const query = {
-      text: `SELECT t.*
+  get_templatesBy_parentID = async (req, res) => {
+    try {
+
+      const {
+        org_id,
+        industry
+
+      } = req.body;
+
+      const query = {
+        text: `SELECT t.*
 FROM templates t
 JOIN organisation o
     ON t.org_id = o.org_id
@@ -1044,30 +1044,30 @@ WHERE o.parent_org_id = (
 AND t.industry = $2;     -- <-- send industry here
 
 `,
-      values: [
-        org_id, 
-        industry
-      ]
-    };
+        values: [
+          org_id,
+          industry
+        ]
+      };
 
-    const result = await this.utility.sql.query(query);
+      const result = await this.utility.sql.query(query);
 
-    if (!result.rows || result.rows.length === 0) {
-      return this.utility.response.init(res, false, "No response from database", {}, 500);
+      if (!result.rows || result.rows.length === 0) {
+        return this.utility.response.init(res, false, "No response from database", {}, 500);
+      }
+
+      return this.utility.response.init(
+        res,
+        true,
+        "getting Users under Organisation  successfully ",
+        { facility: result.rows }
+      );
+
+    } catch (err) {
+      console.error("createFacility error:", err);
+      return this.utility.response.init(res, false, "Internal server error");
     }
-
-    return this.utility.response.init(
-      res,
-      true,
-      "getting Users under Organisation  successfully ",
-      { facility: result.rows }
-    );
-
-  } catch (err) {
-    console.error("createFacility error:", err);
-    return this.utility.response.init(res, false, "Internal server error");
-  }
-};
+  };
 
 }
 
