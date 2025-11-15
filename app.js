@@ -347,6 +347,12 @@ utility.app.post('/append_staged_activity_by_id',
   // validation.validate(validationSchemas.createCustomTemplate),
   templates.append_staged_activity_by_id
 );
+ 
+utility.app.post('/ commit_staged_changes_to_project', 
+  // utility.authenticateToken,
+  // validation.validate(validationSchemas.createCustomTemplate),
+  templates. commit_staged_changes_to_project
+);
 
 
 //temp10

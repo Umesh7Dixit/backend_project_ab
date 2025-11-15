@@ -151,54 +151,6 @@ class Templates {
   };
 
 
-  append_staged_activity_by_id = async (req, res) => {
-    try {
-      const { p_project_id, p_subcategory_id, p_frequency } = req.query;
-
-      const query = {
-        text: 'SELECT append_staged_activity_by_id($1,$2,$3) as template_data',
-        values: [p_project_id, p_subcategory_id, p_frequency]
-      };
-
-      const result = await this.utility.sql.query(query);
-
-      if (!result.rows || result.rows.length === 0) {
-        return this.utility.response.init(res, false, "append_staged_activity_by_id not found", {
-          error: "append_staged_activity_by_id_NOT_FOUND"
-        }, 404);
-      }
-
-      const templateData = result.rows[0].template_data;
-
-      if (!templateData) {
-        return this.utility.response.init(res, false, "Template data is empty", {
-          error: "EMPTY_TEMPLATE"
-        }, 404);
-      }
-
-      return this.utility.response.init(
-        res,
-        true,
-        "append_staged_activity_by_id successfully",
-        {
-          template: templateData
-        }
-      );
-
-    } catch (error) {
-      console.error('Error fetching template details:', error);
-      return this.utility.response.init(
-        res,
-        false,
-        "Internal server error while fetching template details",
-        {
-          error: "INTERNAL_SERVER_ERROR",
-          details: error.message
-        },
-        500
-      );
-    }
-  };
 
 
   GetTemplatesForUser = async (req, res) => {
@@ -671,6 +623,13 @@ class Templates {
   };
 
 
+
+
+
+
+
+  
+
   save_project_activity_configuration = async (req, res) => {
     try {
 
@@ -713,6 +672,17 @@ class Templates {
       );
     }
   };
+
+
+
+
+
+
+
+
+
+
+
 
 
   copy_template_to_staging_area = async (req, res) => {
@@ -803,9 +773,112 @@ class Templates {
   };
 
 
+  
+  append_staged_activity_by_id = async (req, res) => {
+    try {
+      const { p_project_id, p_subcategory_id, p_frequency } = req.query;
+
+      const query = {
+        text: 'SELECT append_staged_activity_by_id($1,$2,$3) as template_data',
+        values: [p_project_id, p_subcategory_id, p_frequency]
+      };
+
+      const result = await this.utility.sql.query(query);
+
+      if (!result.rows || result.rows.length === 0) {
+        return this.utility.response.init(res, false, "append_staged_activity_by_id not found", {
+          error: "append_staged_activity_by_id_NOT_FOUND"
+        }, 404);
+      }
+
+      const templateData = result.rows[0].template_data;
+
+      if (!templateData) {
+        return this.utility.response.init(res, false, "Template data is empty", {
+          error: "EMPTY_TEMPLATE"
+        }, 404);
+      }
+
+      return this.utility.response.init(
+        res,
+        true,
+        "append_staged_activity_by_id successfully",
+        {
+          template: templateData
+        }
+      );
+
+    } catch (error) {
+      console.error('Error fetching template details:', error);
+      return this.utility.response.init(
+        res,
+        false,
+        "Internal server error while fetching template details",
+        {
+          error: "INTERNAL_SERVER_ERROR",
+          details: error.message
+        },
+        500
+      );
+    }
+  };
 
 
-    create_custom_template_from_scratch = async(req,res) => {
+
+
+   commit_staged_changes_to_project = async (req, res) => {
+    try {
+
+      const { p_project_id } = req.body
+
+      const query = {
+        text: 'SELECT * FROM   commit_staged_changes_to_project($1)',
+        values: [p_project_id]
+      };
+
+      const result = await this.utility.sql.query(query);
+
+      if (!result.rows) {
+        return this.utility.response.init(res, false, "No response from database", {
+          error: "DATABASE_ERROR"
+        }, 500);
+      }
+
+      return this.utility.response.init(
+        res,
+        true,
+        " commit_staged_changes_to_project successfully",
+        {
+          templates: result.rows,
+          count: result.rows.length
+        }
+      );
+
+    } catch (error) {
+      console.error('Error fetching templates:', error);
+      return this.utility.response.init(
+        res,
+        false,
+        "Internal server error while fetching templates",
+        {
+          error: "INTERNAL_SERVER_ERROR",
+          details: error.message
+        },
+        500
+      );
+    }
+  };
+
+
+
+
+
+
+
+
+
+
+  create_custom_template_from_scratch = async(req,res) => {
              try {
           
                 const {p_creator_user_id , p_template_name,  p_description,  p_industry,  p_template_payload } = req.body 
