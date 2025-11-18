@@ -517,6 +517,113 @@ utility.app.post('/getorg_name_and_id',
 
 
 
+
+
+
+
+
+
+// ______________Upload Functionality________________________________
+
+ 
+
+
+
+
+const express = require("express");
+const csv = require("csv-parser");
+const multer = require("multer");
+
+
+const upload2 = multer({ storage: multer.memoryStorage() });
+
+utility.app.post("/upload-csv", upload2.single("file"), async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ message: "File not found" });
+        }
+
+        const results = [];
+        const bufferStream = require("stream").Readable.from(req.file.buffer);
+
+        bufferStream
+            .pipe(csv())
+            .on("data", (row) => results.push(row))
+            .on("end", () => {
+
+                const templates = results.map(row => {
+                     
+                    const obj = {
+                        project_activity_id: Number(row.project_activity_id),
+                        main_category: row.main_category,
+                        sub_category: row.sub_category,
+                        activity: row.activity,
+                        selection_1: row.selection_1,
+                        selection_2: row.selection_2,
+                        unit: row.unit,
+                        monthly_data: {},
+                        subcategory_id: 124  
+                        // subcategory_id: row.subcategory_id  
+                    };
+
+                    // extract month columns (remaining keys)
+                    Object.keys(row).forEach(key => {
+                        if (
+                            key !== "project_activity_id" &&
+                            key !== "main_category" &&
+                            key !== "sub_category" &&
+                            key !== "activity" &&
+                            key !== "selection_1" &&
+                            key !== "selection_2" &&
+                            key !== "unit"
+                        ) {
+                            if (row[key] !== "") {
+                                obj.monthly_data[key.replace("-", " ")] = {
+                                    quantity: Number(row[key])
+                                };
+                            }
+                        }
+                    });
+
+                    return obj;
+                });
+
+                res.json({
+                    issuccessful: true,
+                    message: "Data Parsed successfully",
+                    data: {
+                        templates,
+                        count: templates.length
+                    }
+                });
+            });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({
+            issuccessful: false,
+            message: "Internal server error",
+            error: err.message
+        });
+    }
+});
+ 
+
+
+
+
+
+
+// -------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
 utility.app.get('/', (req, res) => {
   res.send("Hello I am working");
 })
