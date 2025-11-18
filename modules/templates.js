@@ -1238,6 +1238,53 @@ class Templates {
 
 
 
+  update_project_member_permission = async (req, res) => {
+    try {
+
+      const { p_project_id, p_member_user_id,p_new_permission_level } = req.body
+
+      const query = {
+        text: 'SELECT * FROM  update_project_member_permission($1,$2,$3)',
+        values: [p_project_id, p_member_user_id,p_new_permission_level]
+      };
+
+      const result = await this.utility.sql.query(query);
+
+      if (!result.rows) {
+        return this.utility.response.init(res, false, "No response from database", {
+          error: "DATABASE_ERROR"
+        }, 500);
+      }
+
+      return this.utility.response.init(
+        res,
+        true,
+        "update project member permission  successfully",
+        {
+          templates: result.rows,
+          count: result.rows.length
+        }
+      );
+
+    } catch (error) {
+      console.error('Error fetching templates:', error);
+      return this.utility.response.init(
+        res,
+        false,
+        "Internal server error while fetching templates",
+        {
+          error: "INTERNAL_SERVER_ERROR",
+          details: error.message
+        },
+        500
+      );
+    }
+  }
+
+
+
+
+
 
   // get_data_collection_sheet_for_scope = async (req, res) => {
   //   try {

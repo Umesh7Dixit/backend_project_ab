@@ -429,6 +429,13 @@ utility.app.post('/upsert_activity_data_batch',
 );
 
 
+utility.app.post('/update_project_member_permission',
+  // utility.authenticateToken,
+  // validation.validate(validationSchemas.createCustomTemplate),
+  templates.update_project_member_permission
+);
+
+
 
 
 
