@@ -872,6 +872,52 @@ class Templates {
 
 
 
+  get_data_collection_sheet_for_scope = async (req, res) => {
+    try {
+
+      const { p_project_id, p_scope_name, p_page_size, p_page_number } = req.body
+
+      const query = {
+        text: 'SELECT * FROM   get_data_collection_sheet_for_scope($1,$2,$3,$4)',
+        values: [p_project_id, p_scope_name, p_page_size, p_page_number]
+      };
+
+      const result = await this.utility.sql.query(query);
+
+      if (!result.rows) {
+        return this.utility.response.init(res, false, "No response from database", {
+          error: "DATABASE_ERROR"
+        }, 500);
+      }
+
+      return this.utility.response.init(
+        res,
+        true,
+        " commit_staged_changes_to_project successfully",
+        {
+          templates: result.rows,
+          count: result.rows.length
+        }
+      );
+
+    } catch (error) {
+      console.error('Error fetching templates:', error);
+      return this.utility.response.init(
+        res,
+        false,
+        "Internal server error while fetching templates",
+        {
+          error: "INTERNAL_SERVER_ERROR",
+          details: error.message
+        },
+        500
+      );
+    }
+  };
+
+
+
+
 
 
 
