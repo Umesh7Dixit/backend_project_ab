@@ -917,6 +917,51 @@ class Templates {
 
 
 
+  upsert_activity_data_batch = async (req, res) => {
+    try {
+
+      const { p_project_id, p_user_id, p_data_batch } = req.body
+
+      const query = {
+        text: 'SELECT * FROM   upsert_activity_data_batch($1,$2,$3)',
+        values: [p_project_id, p_user_id, p_data_batch]
+      };
+
+      const result = await this.utility.sql.query(query);
+
+      if (!result.rows) {
+        return this.utility.response.init(res, false, "No response from database", {
+          error: "DATABASE_ERROR"
+        }, 500);
+      }
+
+      return this.utility.response.init(
+        res,
+        true,
+        " commit_staged_changes_to_project successfully",
+        {
+          templates: result.rows,
+          count: result.rows.length
+        }
+      );
+
+    } catch (error) {
+      console.error('Error fetching templates:', error);
+      return this.utility.response.init(
+        res,
+        false,
+        "Internal server error while fetching templates",
+        {
+          error: "INTERNAL_SERVER_ERROR",
+          details: error.message
+        },
+        500
+      );
+    }
+  };
+
+
+
 
 
 
