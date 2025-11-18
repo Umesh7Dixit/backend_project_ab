@@ -870,6 +870,228 @@ class Templates {
   };
 
 
+  run_all_validations_for_project = async (req, res) => {
+    try {
+
+      const { p_project_id } = req.body
+
+      const query = {
+        text: 'SELECT * FROM   run_all_validations_for_project($1)',
+        values: [p_project_id]
+      };
+
+      const result = await this.utility.sql.query(query);
+
+      if (!result.rows) {
+        return this.utility.response.init(res, false, "No response from database", {
+          error: "DATABASE_ERROR"
+        }, 500);
+      }
+
+      return this.utility.response.init(
+        res,
+        true,
+        "run_all_validations_for_project successfully",
+        {
+          templates: result.rows,
+          count: result.rows.length
+        }
+      );
+
+    } catch (error) {
+      console.error('Error fetching templates:', error);
+      return this.utility.response.init(
+        res,
+        false,
+        "Internal server error while fetching templates",
+        {
+          error: "INTERNAL_SERVER_ERROR",
+          details: error.message
+        },
+        500
+      );
+    }
+  };
+
+
+
+  get_project_review_data = async (req, res) => {
+    try {
+
+      const { p_project_id, p_scope_name } = req.body
+
+      const query = {
+        text: 'SELECT * FROM   get_project_review_data($1,$2)',
+        values: [p_project_id,p_scope_name]
+      };
+
+      const result = await this.utility.sql.query(query);
+
+      if (!result.rows) {
+        return this.utility.response.init(res, false, "No response from database", {
+          error: "DATABASE_ERROR"
+        }, 500);
+      }
+
+      return this.utility.response.init(
+        res,
+        true,
+        "get_project_review_data successfully",
+        {
+          templates: result.rows,
+          count: result.rows.length
+        }
+      );
+
+    } catch (error) {
+      console.error('Error fetching templates:', error);
+      return this.utility.response.init(
+        res,
+        false,
+        "Internal server error while fetching templates",
+        {
+          error: "INTERNAL_SERVER_ERROR",
+          details: error.message
+        },
+        500
+      );
+    }
+  };
+
+
+
+  submit_project_for_approval  = async (req, res) => {
+    try {
+
+      const { p_project_id, p_project_user_ids } = req.body
+
+      const query = {
+        text: 'SELECT * FROM   submit_project_for_approval($1,$2)',
+        values: [p_project_id,p_project_user_ids]
+      };
+
+      const result = await this.utility.sql.query(query);
+
+      if (!result.rows) {
+        return this.utility.response.init(res, false, "No response from database", {
+          error: "DATABASE_ERROR"
+        }, 500);
+      }
+
+      return this.utility.response.init(
+        res,
+        true,
+        "submit_project_for_approval successfully",
+        {
+          templates: result.rows,
+          count: result.rows.length
+        }
+      );
+
+    } catch (error) {
+      console.error('Error fetching templates:', error);
+      return this.utility.response.init(
+        res,
+        false,
+        "Internal server error while fetching templates",
+        {
+          error: "INTERNAL_SERVER_ERROR",
+          details: error.message
+        },
+        500
+      );
+    }
+  };
+
+
+  get_approval_status_for_project  = async (req, res) => {
+    try {
+
+      const { p_project_id } = req.body
+
+      const query = {
+        text: 'SELECT * FROM   get_approval_status_for_project($1)',
+        values: [p_project_id]
+      };
+
+      const result = await this.utility.sql.query(query);
+
+      if (!result.rows) {
+        return this.utility.response.init(res, false, "No response from database", {
+          error: "DATABASE_ERROR"
+        }, 500);
+      }
+
+      return this.utility.response.init(
+        res,
+        true,
+        "get_approval_status_for_project successfully",
+        {
+          templates: result.rows,
+          count: result.rows.length
+        }
+      );
+
+    } catch (error) {
+      console.error('Error fetching templates:', error);
+      return this.utility.response.init(
+        res,
+        false,
+        "Internal server error while fetching templates",
+        {
+          error: "INTERNAL_SERVER_ERROR",
+          details: error.message
+        },
+        500
+      );
+    }
+  };
+
+
+  upload_document_for_activity  = async (req, res) => {
+    try {
+
+      const { p_project_id, p_user_id, p_activity_id, p_file_name, p_file_url, p_file_size } = req.body
+
+      const query = {
+        text: 'SELECT * FROM   upload_document_for_activity($1,$2,$3,$4,$5,$6)',
+        values: [p_project_id, p_user_id, p_activity_id, p_file_name, p_file_url, p_file_size]
+      };
+
+      const result = await this.utility.sql.query(query);
+
+      if (!result.rows) {
+        return this.utility.response.init(res, false, "No response from database", {
+          error: "DATABASE_ERROR"
+        }, 500);
+      }
+
+      return this.utility.response.init(
+        res,
+        true,
+        "upload_document_for_activity successfully",
+        {
+          templates: result.rows,
+          count: result.rows.length
+        }
+      );
+
+    } catch (error) {
+      console.error('Error fetching templates:', error);
+      return this.utility.response.init(
+        res,
+        false,
+        "Internal server error while fetching templates",
+        {
+          error: "INTERNAL_SERVER_ERROR",
+          details: error.message
+        },
+        500
+      );
+    }
+  };
+
+
 
 
   get_data_collection_sheet_for_scope = async (req, res) => {
@@ -893,7 +1115,7 @@ class Templates {
       return this.utility.response.init(
         res,
         true,
-        " commit_staged_changes_to_project successfully",
+        "get_data_collection_sheet_for_scope successfully",
         {
           templates: result.rows,
           count: result.rows.length

@@ -362,6 +362,39 @@ utility.app.post('/create_custom_temp_template_from_scratch',
   templates.create_custom_temp_template_from_scratch
 );
 
+
+
+utility.app.post('/run_all_validations_for_project',
+  // utility.authenticateToken,
+  // validation.validate(validationSchemas.createCustomTemplate),
+  templates.run_all_validations_for_project
+);
+
+utility.app.post('/get_project_review_data',
+  // utility.authenticateToken,
+  // validation.validate(validationSchemas.createCustomTemplate),
+  templates.get_project_review_data
+);
+
+utility.app.post('/submit_project_for_approval',
+  // utility.authenticateToken,
+  // validation.validate(validationSchemas.createCustomTemplate),
+  templates.submit_project_for_approval
+);
+
+utility.app.post('/get_approval_status_for_project',
+  // utility.authenticateToken,
+  // validation.validate(validationSchemas.createCustomTemplate),
+  templates.get_approval_status_for_project
+);
+
+
+utility.app.post('/upload_document_for_activity',
+  // utility.authenticateToken,
+  // validation.validate(validationSchemas.createCustomTemplate),
+  templates.upload_document_for_activity
+);
+
 //temp11
 utility.app.post('/get_data_collection_sheet_for_scope',
   // utility.authenticateToken,
