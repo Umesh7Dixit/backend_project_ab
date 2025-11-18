@@ -378,13 +378,17 @@ utility.app.post('/getUnitById',
   templates.getUnitById
 );
 
-// get_data_collection_sheet_for_scope
+
+
+//new
 utility.app.post('/get_data_collection_sheet_for_scope',
   // utility.authenticateToken,
   // validation.validate(validationSchemas.createCustomTemplate),
   templates.get_data_collection_sheet_for_scope
 );
-// get_data_collection_sheet_for_scope
+
+
+
 utility.app.post('/upsert_activity_data_batch',
   // utility.authenticateToken,
   // validation.validate(validationSchemas.createCustomTemplate),
