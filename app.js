@@ -554,14 +554,18 @@ utility.app.post("/upload-csv", upload2.single("file"), async (req, res) => {
         const bufferStream = require("stream").Readable.from(req.file.buffer);
 
         bufferStream
-            .pipe(csv())
+            // .pipe(csv())
+            .pipe(csv({ separator: "\t" }))
             .on("data", (row) => results.push(row))
             .on("end", () => {
 
                 const templates = results.map(row => {
-                     
+                     const cleanHeaders = {};
+                        Object.keys(row).forEach(key => {
+                            cleanHeaders[key.trim().toLowerCase().replace(/ /g, "_")] = row[key];
+                      });
                     const obj = {
-                        project_activity_id: Number(row.project_activity_id),
+                        project_activity_id: Number(cleanHeaders.project_activity_id),
                         main_category: row.main_category,
                         sub_category: row.sub_category,
                         activity: row.activity,
