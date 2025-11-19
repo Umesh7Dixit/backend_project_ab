@@ -555,7 +555,18 @@ utility.app.post("/upload-csv", upload2.single("file"), async (req, res) => {
 
         bufferStream
             // .pipe(csv())
-            .pipe(csv({ separator: "\t" }))
+               .pipe(csv({
+      mapHeaders: ({ header }) =>
+        header
+          .replace(/^\uFEFF/, "")        
+          .trim()
+          .toLowerCase()
+          .replace(/ /g, "_")
+  }))
+//   .pipe(csv({
+//   mapHeaders: ({ header }) => header.replace(/^\uFEFF/, "") // remove BOM
+// }))
+
             .on("data", (row) => results.push(row))
             .on("end", () => {
 
