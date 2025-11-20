@@ -515,6 +515,28 @@ utility.app.post('/getorg_name_and_id',
 
 
 
+
+utility.app.post('/add_new_member_to_project',
+  // utility.authenticateToken,
+  // validation.validate(validationSchemas.saveProjectActivityConfiguration),
+  templates.add_new_member_to_project
+);
+
+
+
+
+utility.app.post('/update_project_member_permission',
+  templates.update_project_member_permission
+);
+
+
+
+utility.app.post('/remove_member_from_project',
+  templates.remove_member_from_project
+);
+
+
+
 // utility.app.post('/userlogout' ,                                    utility.authenticateToken,  register.userlogout);
 
 
@@ -537,12 +559,14 @@ utility.app.post('/getorg_name_and_id',
 
 
 
-const express = require("express");
 const csv = require("csv-parser");
 const multer = require("multer");
 
 
 const upload2 = multer({ storage: multer.memoryStorage() });
+ 
+
+const { Readable } = require("stream");
 
 utility.app.post("/upload-csv", upload2.single("file"), async (req, res) => {
     try {
@@ -550,72 +574,80 @@ utility.app.post("/upload-csv", upload2.single("file"), async (req, res) => {
             return res.status(400).json({ message: "File not found" });
         }
 
+        let raw = req.file.buffer.toString("latin1");
+
+         
+        raw = raw.replace(/^\uFEFF/, "");
+
+        raw = raw.replace(/\u00A0/g, " ");
+
+        let delimiter = raw.includes("\t") ? "\t" : ",";
+
         const results = [];
-        const bufferStream = require("stream").Readable.from(req.file.buffer);
 
-        bufferStream
-            // .pipe(csv())
-               .pipe(csv({
-      mapHeaders: ({ header }) =>
-        header
-          .replace(/^\uFEFF/, "")        
-          .trim()
-          .toLowerCase()
-          .replace(/ /g, "_")
-  }))
-//   .pipe(csv({
-//   mapHeaders: ({ header }) => header.replace(/^\uFEFF/, "") // remove BOM
-// }))
+         Readable.from(raw.split(/\r?\n/))
+    .pipe(
+        csv({
+            separator: delimiter,
+            mapHeaders: ({ header }) =>
+                header
+                    .trim()
+                    .toLowerCase()
+                    .replace(/[\s]+/g, "_")
+        })
+    )
 
-            .on("data", (row) => results.push(row))
-            .on("end", () => {
-
-                const templates = results.map(row => {
-                     const cleanHeaders = {};
-                        Object.keys(row).forEach(key => {
-                            cleanHeaders[key.trim().toLowerCase().replace(/ /g, "_")] = row[key];
-                      });
-                    const obj = {
-                        project_activity_id: Number(cleanHeaders.project_activity_id),
-                        main_category: row.main_category,
-                        sub_category: row.sub_category,
-                        activity: row.activity,
-                        selection_1: row.selection_1,
-                        selection_2: row.selection_2,
-                        unit: row.unit,
-                        monthly_data: {},
-                        subcategory_id: 124  
-                        // subcategory_id: row.subcategory_id  
-                    };
-
-                    // extract month columns (remaining keys)
-                    Object.keys(row).forEach(key => {
-                        if (
-                            key !== "project_activity_id" &&
-                            key !== "main_category" &&
-                            key !== "sub_category" &&
-                            key !== "activity" &&
-                            key !== "selection_1" &&
-                            key !== "selection_2" &&
-                            key !== "unit"
-                        ) {
-                            if (row[key] !== "") {
-                                obj.monthly_data[key.replace("-", " ")] = {
-                                    quantity: Number(row[key])
-                                };
-                            }
-                        }
-                    });
-
-                    return obj;
+            .on("data", (row) => {
+                
+                const clean = {};
+                Object.keys(row).forEach((k) => {
+                    let key = k.trim().toLowerCase().replace(/[\s]+/g, "_");
+                    clean[key] = (row[k] || "").toString().trim();
                 });
 
+              
+                const obj = {
+                    project_activity_id: Number(clean.project_activity_id) || null,
+                    main_category: clean.main_category || "",
+                    sub_category: clean.sub_category || "",
+                    activity: clean.activity || "",
+                    selection_1: clean.selection_1 || "",
+                    selection_2: clean.selection_2 || "",
+                    unit: clean.unit || "",
+                    monthly_data: {},
+                    subcategory_id: 124
+                };
+
+                 
+                Object.keys(clean).forEach((key) => {
+                    if (
+                        ![
+                            "project_activity_id",
+                            "main_category",
+                            "sub_category",
+                            "activity",
+                            "selection_1",
+                            "selection_2",
+                            "unit"
+                        ].includes(key)
+                    ) {
+                        if (clean[key] !== "") {
+                            obj.monthly_data[key.replace(/-/g, " ")] = {
+                                quantity: Number(clean[key]) || 0
+                            };
+                        }
+                    }
+                });
+
+                results.push(obj);
+            })
+            .on("end", () => {
                 res.json({
                     issuccessful: true,
                     message: "Data Parsed successfully",
                     data: {
-                        templates,
-                        count: templates.length
+                        templates: results,
+                        count: results.length
                     }
                 });
             });
@@ -629,16 +661,6 @@ utility.app.post("/upload-csv", upload2.single("file"), async (req, res) => {
         });
     }
 });
- 
-
-
-
-
-
-
-// -------------------------------------------------------------------------------------------------
-
-
 
 
 

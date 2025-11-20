@@ -1286,6 +1286,146 @@ class Templates {
 
 
 
+  add_new_member_to_project = async (req, res) => {
+    try {
+
+      const { p_project_id, p_user_id,p_role_name, p_permission_level } = req.body
+
+      const query = {
+        text: 'Select * from add_new_member_to_project($1,$2,$3,$4)',
+        values: [p_project_id, p_user_id,p_role_name, p_permission_level]
+      };
+
+      const result = await this.utility.sql.query(query);
+
+      if (!result.rows) {
+        return this.utility.response.init(res, false, "No response from database", {
+          error: "DATABASE_ERROR"
+        }, 500);
+      }
+
+      return this.utility.response.init(
+        res,
+        true,
+        "successfully added new member to project",
+        {
+          templates: result.rows,
+          count: result.rows.length
+        }
+      );
+
+    } catch (error) {
+      console.error('Error fetching templates:', error);
+      return this.utility.response.init(
+        res,
+        false,
+        "Internal server error while fetching templates",
+        {
+          error: "INTERNAL_SERVER_ERROR",
+          details: error.message
+        },
+        500
+      );
+    }
+  }
+
+
+
+
+  update_project_member_permission = async (req, res) => {
+    try {
+
+      const { p_project_id, p_member_user_id, p_new_permission_level } = req.body
+
+      const query = {
+        text: 'Select * from update_project_member_permission($1,$2,$3)',
+        values: [p_project_id, p_member_user_id, p_new_permission_level]
+      };
+
+      const result = await this.utility.sql.query(query);
+
+      if (!result.rows) {
+        return this.utility.response.init(res, false, "No response from database", {
+          error: "DATABASE_ERROR"
+        }, 500);
+      }
+
+      return this.utility.response.init(
+        res,
+        true,
+        "successfully updated project member permission",
+        {
+          templates: result.rows,
+          count: result.rows.length
+        }
+      );
+
+    } catch (error) {
+      console.error('Error fetching templates:', error);
+      return this.utility.response.init(
+        res,
+        false,
+        "Internal server error while fetching templates",
+        {
+          error: "INTERNAL_SERVER_ERROR",
+          details: error.message
+        },
+        500
+      );
+    }
+  }
+
+
+
+
+  remove_member_from_project = async (req, res) => {
+    try {
+
+      const { p_project_id, p_user_id } = req.body
+
+      const query = {
+        text: 'Select * from remove_member_from_project($1,$2)',
+        values: [p_project_id, p_user_id]
+      };
+
+      const result = await this.utility.sql.query(query);
+
+      if (!result.rows) {
+        return this.utility.response.init(res, false, "No response from database", {
+          error: "DATABASE_ERROR"
+        }, 500);
+      }
+
+      return this.utility.response.init(
+        res,
+        true,
+        "successfully removed member from project",
+        {
+          templates: result.rows,
+          count: result.rows.length
+        }
+      );
+
+    } catch (error) {
+      console.error('Error fetching templates:', error);
+      return this.utility.response.init(
+        res,
+        false,
+        "Internal server error while fetching templates",
+        {
+          error: "INTERNAL_SERVER_ERROR",
+          details: error.message
+        },
+        500
+      );
+    }
+  }
+
+
+
+
+
+
   // get_data_collection_sheet_for_scope = async (req, res) => {
   //   try {
 
