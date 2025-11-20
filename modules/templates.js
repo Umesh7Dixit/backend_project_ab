@@ -1091,6 +1091,94 @@ class Templates {
     }
   };
 
+  get_project_members_for_approval  = async (req, res) => {
+    try {
+
+      const { p_project_id} = req.body
+
+      const query = {
+        text: 'SELECT * FROM   get_project_members_for_approval($1)',
+        values: [p_project_id]
+      };
+
+      const result = await this.utility.sql.query(query);
+
+      if (!result.rows) {
+        return this.utility.response.init(res, false, "No response from database", {
+          error: "DATABASE_ERROR"
+        }, 500);
+      }
+
+      return this.utility.response.init(
+        res,
+        true,
+        "get_project_members_for_approval  successfully",
+        {
+          templates: result.rows,
+          count: result.rows.length
+        }
+      );
+
+    } catch (error) {
+      console.error('Error fetching templates:', error);
+      return this.utility.response.init(
+        res,
+        false,
+        "Internal server error while fetching templates",
+        {
+          error: "INTERNAL_SERVER_ERROR",
+          details: error.message
+        },
+        500
+      );
+    }
+  };
+
+
+
+  get_available_users_for_project_team  = async (req, res) => {
+    try {
+
+      const { p_project_id} = req.body
+
+      const query = {
+        text: 'SELECT * FROM   get_available_users_for_project_team($1)',
+        values: [p_project_id]
+      };
+
+      const result = await this.utility.sql.query(query);
+
+      if (!result.rows) {
+        return this.utility.response.init(res, false, "No response from database", {
+          error: "DATABASE_ERROR"
+        }, 500);
+      }
+
+      return this.utility.response.init(
+        res,
+        true,
+        "get_available_users_for_project_team successfully",
+        {
+          templates: result.rows,
+          count: result.rows.length
+        }
+      );
+
+    } catch (error) {
+      console.error('Error fetching templates:', error);
+      return this.utility.response.init(
+        res,
+        false,
+        "Internal server error while fetching templates",
+        {
+          error: "INTERNAL_SERVER_ERROR",
+          details: error.message
+        },
+        500
+      );
+    }
+  };
+
 
 
 

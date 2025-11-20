@@ -536,6 +536,16 @@ utility.app.post('/remove_member_from_project',
 );
 
 
+utility.app.post('/get_project_members_for_approval ',
+  templates.get_project_members_for_approval 
+);
+
+
+utility.app.post('/get_available_users_for_project_team',
+  templates.get_available_users_for_project_team
+);
+
+
 
 // utility.app.post('/userlogout' ,                                    utility.authenticateToken,  register.userlogout);
 
