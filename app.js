@@ -545,6 +545,10 @@ utility.app.post('/get_available_users_for_project_team',
   templates.get_available_users_for_project_team
 );
 
+utility.app.post('/get_project_overall_completion',
+  templates.get_project_overall_completion
+);
+
 
 
 // utility.app.post('/userlogout' ,                                    utility.authenticateToken,  register.userlogout);
