@@ -548,6 +548,24 @@ utility.app.post('/search_auditors_to_add_to_project',
 );
 
 
+utility.app.post('/synchronize_project_approver',
+  templates.synchronize_project_approver
+);
+
+utility.app.post('/create_new_project_request_with_file',
+  templates.create_new_project_request_with_file
+);
+
+utility.app.post('/get_project_total_emissions_summary',
+  templates.get_project_total_emissions_summary
+);
+
+
+utility.app.post('/get_project_monthly_summary',
+  templates.get_project_monthly_summary
+);
+
+
 // utility.app.post('/userlogout' ,                                    utility.authenticateToken,  register.userlogout);
 
 

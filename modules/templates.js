@@ -1220,6 +1220,186 @@ class Templates {
     }
   };
 
+  synchronize_project_approver = async (req, res) => {
+    try {
+
+      const { p_project_id, p_new_approver_ids } = req.body
+
+      const query = {
+        text: 'Select * from synchronize_project_approver($1,$2)',
+        values: [p_project_id, p_new_approver_ids]
+      };
+
+      const result = await this.utility.sql.query(query);
+
+      if (!result.rows) {
+        return this.utility.response.init(res, false, "No response from database", {
+          error: "DATABASE_ERROR"
+        }, 500);
+      }
+
+      return this.utility.response.init(
+        res,
+        true,
+        "template copy successfully",
+        {
+          templates: result.rows,
+          count: result.rows.length
+        }
+      );
+
+    } catch (error) {
+      console.error('Error fetching templates:', error);
+      return this.utility.response.init(
+        res,
+        false,
+        "Internal server error while fetching templates",
+        {
+          error: "INTERNAL_SERVER_ERROR",
+          details: error.message
+        },
+        500
+      );
+    }
+  };
+
+  get_project_monthly_summary = async (req, res) => {
+    try {
+
+      const { p_project_id, p_new_approver_ids } = req.body
+
+      const query = {
+        text: 'Select * from synchronize_project_approver($1,$2)',
+        values: [p_project_id, p_new_approver_ids]
+      };
+
+      const result = await this.utility.sql.query(query);
+
+      if (!result.rows) {
+        return this.utility.response.init(res, false, "No response from database", {
+          error: "DATABASE_ERROR"
+        }, 500);
+      }
+
+      return this.utility.response.init(
+        res,
+        true,
+        "template copy successfully",
+        {
+          templates: result.rows,
+          count: result.rows.length
+        }
+      );
+
+    } catch (error) {
+      console.error('Error fetching templates:', error);
+      return this.utility.response.init(
+        res,
+        false,
+        "Internal server error while fetching templates",
+        {
+          error: "INTERNAL_SERVER_ERROR",
+          details: error.message
+        },
+        500
+      );
+    }
+  };
+
+
+
+  create_new_project_request_with_file = async (req, res) => {
+    try {
+
+      const { p_creator_id, p_project_id, p_assignee_id, p_request_type,p_title, p_description, p_file_name, p_file_url, p_file_size } = req.body
+
+      const query = {
+        text: 'Select * from create_new_project_request_with_file($1,$2,$3,$4,$5,$6,$7,$8,$9)',
+        values: [p_creator_id, p_project_id, p_assignee_id, p_request_type,p_title, p_description, p_file_name, p_file_url, p_file_size]
+      };
+
+      const result = await this.utility.sql.query(query);
+
+      if (!result.rows) {
+        return this.utility.response.init(res, false, "No response from database", {
+          error: "DATABASE_ERROR"
+        }, 500);
+      }
+
+      return this.utility.response.init(
+        res,
+        true,
+        "create_new_project_request_with_file successfully",
+        {
+          templates: result.rows,
+          count: result.rows.length
+        }
+      );
+
+    } catch (error) {
+      console.error('Error fetching templates:', error);
+      return this.utility.response.init(
+        res,
+        false,
+        "Internal server error while fetching templates",
+        {
+          error: "INTERNAL_SERVER_ERROR",
+          details: error.message
+        },
+        500
+      );
+    }
+  };
+
+
+
+
+  get_project_total_emissions_summary = async (req, res) => {
+    try {
+
+      const { p_project_id } = req.body
+
+      const query = {
+        text: 'Select * from get_project_total_emissions_summary($1)',
+        values: [ p_project_id]
+      };
+
+      const result = await this.utility.sql.query(query);
+
+      if (!result.rows) {
+        return this.utility.response.init(res, false, "No response from database", {
+          error: "DATABASE_ERROR"
+        }, 500);
+      }
+
+      return this.utility.response.init(
+        res,
+        true,
+        "get_project_total_emissions_summary successfully",
+        {
+          templates: result.rows,
+          count: result.rows.length
+        }
+      );
+
+    } catch (error) {
+      console.error('Error fetching templates:', error);
+      return this.utility.response.init(
+        res,
+        false,
+        "Internal server error while fetching templates",
+        {
+          error: "INTERNAL_SERVER_ERROR",
+          details: error.message
+        },
+        500
+      );
+    }
+  };
+
+
+
+
   get_available_users_for_project_team  = async (req, res) => {
     try {
 
