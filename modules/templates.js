@@ -1223,11 +1223,10 @@ class Templates {
   synchronize_project_approver = async (req, res) => {
     try {
 
-      const { p_project_id, p_new_approver_ids } = req.body
-
+      const { p_project_id, p_role_name, p_new_approver_ids } = req.body
       const query = {
-        text: 'Select * from synchronize_project_approver($1,$2)',
-        values: [p_project_id, p_new_approver_ids]
+        text: 'Select * from synchronize_project_approver($1,$2,$3)',
+        values: [p_project_id, p_role_name, p_new_approver_ids]
       };
 
       const result = await this.utility.sql.query(query);
