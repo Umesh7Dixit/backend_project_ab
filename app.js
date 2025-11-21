@@ -525,18 +525,12 @@ utility.app.post('/add_new_member_to_project',
 
 
 
-utility.app.post('/update_project_member_permission',
-  templates.update_project_member_permission
-);
-
-
-
 utility.app.post('/remove_member_from_project',
   templates.remove_member_from_project
 );
 
 
-utility.app.post('/get_project_members_for_approval ',
+utility.app.post('/get_project_members_for_approval',
   templates.get_project_members_for_approval 
 );
 
@@ -549,6 +543,9 @@ utility.app.post('/get_project_overall_completion',
   templates.get_project_overall_completion
 );
 
+utility.app.post('/search_auditors_to_add_to_project',
+  templates.search_auditors_to_add_to_project
+);
 
 
 // utility.app.post('/userlogout' ,                                    utility.authenticateToken,  register.userlogout);
