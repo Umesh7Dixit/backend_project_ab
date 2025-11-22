@@ -1874,6 +1874,100 @@ class Templates {
 
 
 
+  
+  remove_project_auditor  = async (req, res) => {
+    try {
+
+      const { p_project_id, p_auditor_id, p_requester_id} = req.body
+
+      const query = {
+        text: 'SELECT * FROM remove_project_auditor($1,$2,$3)',
+        values: [p_project_id, p_auditor_id, p_requester_id]
+      };
+
+      const result = await this.utility.sql.query(query);
+
+      if (!result.rows) {
+        return this.utility.response.init(res, false, "No response from database", {
+          error: "DATABASE_ERROR"
+        }, 500);
+      }
+
+      return this.utility.response.init(
+        res,
+        true,
+        "remove_project_auditor successfully",
+        {
+          templates: result.rows,
+          count: result.rows.length
+        }
+      );
+
+    } catch (error) {
+      console.error('Error fetching templates:', error);
+      return this.utility.response.init(
+        res,
+        false,
+        "Internal server error while fetching templates",
+        {
+          error: "INTERNAL_SERVER_ERROR",
+          details: error.message
+        },
+        500
+      );
+    }
+  };
+
+
+
+  
+  recalculate_project_status  = async (req, res) => {
+    try {
+
+      const { p_project_id} = req.body
+
+      const query = {
+        text: 'SELECT * FROM recalculate_project_status($1)',
+        values: [p_project_id]
+      };
+
+      const result = await this.utility.sql.query(query);
+
+      if (!result.rows) {
+        return this.utility.response.init(res, false, "No response from database", {
+          error: "DATABASE_ERROR"
+        }, 500);
+      }
+
+      return this.utility.response.init(
+        res,
+        true,
+        "recalculate_project_status successfully",
+        {
+          templates: result.rows,
+          count: result.rows.length
+        }
+      );
+
+    } catch (error) {
+      console.error('Error fetching templates:', error);
+      return this.utility.response.init(
+        res,
+        false,
+        "Internal server error while fetching templates",
+        {
+          error: "INTERNAL_SERVER_ERROR",
+          details: error.message
+        },
+        500
+      );
+    }
+  };
+
+
+
+
+
 }
 
 module.exports = Templates;
