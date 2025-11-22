@@ -2110,6 +2110,54 @@ class Templates {
 
 
 
+  
+  
+  get_project_category_totals  = async (req, res) => {
+    try {
+
+      const { project_id} = req.body
+
+      const query = {
+        text: 'SELECT * FROM get_project_category_totals = $1',
+        values: [project_id]
+      };
+
+      const result = await this.utility.sql.query(query);
+
+      if (!result.rows) {
+        return this.utility.response.init(res, false, "No response from database", {
+          error: "DATABASE_ERROR"
+        }, 500);
+      }
+
+      return this.utility.response.init(
+        res,
+        true,
+        "Fetching Projects successfully",
+        {
+          templates: result.rows,
+          count: result.rows.length
+        }
+      );
+
+    } catch (error) {
+      console.error('Error fetching templates:', error);
+      return this.utility.response.init(
+        res,
+        false,
+        "Internal server error while fetching templates",
+        {
+          error: "INTERNAL_SERVER_ERROR",
+          details: error.message
+        },
+        500
+      );
+    }
+  };
+
+
+
+
 
 
 }

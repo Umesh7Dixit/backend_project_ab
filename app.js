@@ -587,6 +587,11 @@ utility.app.post('/getUserInfoByUserID',
 );
 
 
+utility.app.post('/get_project_category_totals',
+  templates.get_project_category_totals
+);
+
+
 // utility.app.post('/userlogout' ,                                    utility.authenticateToken,  register.userlogout);
 
 
