@@ -1970,11 +1970,11 @@ class Templates {
   getAllProjectsByOrgID  = async (req, res) => {
     try {
 
-      const { org_id} = req.body
+      const { facility_id} = req.body
 
       const query = {
-        text: 'SELECT * FROM projects WHERE org_id = $1',
-        values: [org_id]
+        text: 'SELECT * FROM projects WHERE facility_id = $1',
+        values: [facility_id]
       };
 
       const result = await this.utility.sql.query(query);
