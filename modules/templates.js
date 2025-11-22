@@ -2061,6 +2061,57 @@ class Templates {
 
 
 
+
+  
+  
+  getAllProjectsByFacilityID  = async (req, res) => {
+    try {
+
+      const { facility_id} = req.body
+
+      const query = {
+        text: 'SELECT * FROM projects WHERE facility_id = $1',
+        values: [facility_id]
+      };
+
+      const result = await this.utility.sql.query(query);
+
+      if (!result.rows) {
+        return this.utility.response.init(res, false, "No response from database", {
+          error: "DATABASE_ERROR"
+        }, 500);
+      }
+
+      return this.utility.response.init(
+        res,
+        true,
+        "Fetching Projects successfully",
+        {
+          templates: result.rows,
+          count: result.rows.length
+        }
+      );
+
+    } catch (error) {
+      console.error('Error fetching templates:', error);
+      return this.utility.response.init(
+        res,
+        false,
+        "Internal server error while fetching templates",
+        {
+          error: "INTERNAL_SERVER_ERROR",
+          details: error.message
+        },
+        500
+      );
+    }
+  };
+
+
+
+
+
+
 }
 
 module.exports = Templates;

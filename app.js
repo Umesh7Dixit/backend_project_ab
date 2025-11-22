@@ -578,6 +578,10 @@ utility.app.post('/getAllProjectsByOrgID',
   templates.getAllProjectsByOrgID
 );
 
+utility.app.post('/getAllProjectsByFacilityID',
+  templates.getAllProjectsByFacilityID
+);
+
 utility.app.post('/getUserInfoByUserID',
   templates.getUserInfoByUserID
 );
