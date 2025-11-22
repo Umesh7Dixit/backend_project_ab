@@ -1223,11 +1223,11 @@ class Templates {
   synchronize_project_approver = async (req, res) => {
     try {
 
-      const { p_project_id, p_new_approver_ids } = req.body
-
+      const { p_project_id, p_role_name, p_new_approver_ids } = req.body
+      
       const query = {
-        text: 'Select * from synchronize_project_approver($1,$2)',
-        values: [p_project_id, p_new_approver_ids]
+        text: 'Select * from synchronize_project_approver($1,$2,$3)',
+        values: [p_project_id, p_role_name, p_new_approver_ids]
       };
 
       const result = await this.utility.sql.query(query);
@@ -1266,11 +1266,11 @@ class Templates {
   get_project_monthly_summary = async (req, res) => {
     try {
 
-      const { p_project_id, p_new_approver_ids } = req.body
+      const { p_project_id } = req.body
 
       const query = {
-        text: 'Select * from synchronize_project_approver($1,$2)',
-        values: [p_project_id, p_new_approver_ids]
+        text: 'Select * from get_project_monthly_summary($1)',
+        values: [p_project_id]
       };
 
       const result = await this.utility.sql.query(query);
@@ -1641,7 +1641,7 @@ class Templates {
   add_new_member_to_project = async (req, res) => {
     try {
 
-      const { p_project_id, p_user_id,p_role_name, p_permission_level } = req.body
+      const { p_project_id, p_user_id, p_role_name, p_permission_level } = req.body
 
       const query = {
         text: 'Select * from add_new_member_to_project($1,$2,$3,$4)',
