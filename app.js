@@ -710,7 +710,7 @@ utility.app.post("/upload-csv", upload2.single("file"), async (req, res) => {
 
 const { PDFDocument, StandardFonts, rgb } = require("pdf-lib");
 
-utility.app.post("/handler", async (req, res) => {
+utility.app.post("/generate_pdf", async (req, res) => {
   try {
     const body = req.body && Object.keys(req.body).length ? req.body : {};
 
@@ -752,7 +752,7 @@ utility.app.post("/handler", async (req, res) => {
     // WATERMARK - "bsi." in center
     // ============================
     const watermarkText = "bsi.";
-    const watermarkSize = 220;
+    const watermarkSize = 180;
     const watermarkX = width / 2 - 100;
     const watermarkY = height / 2 - 50;
     
@@ -762,7 +762,8 @@ utility.app.post("/handler", async (req, res) => {
       size: watermarkSize,
       font: fontBold,
       color: rgb(0.95, 0.95, 0.95),
-      opacity: 0.15,
+      // opacity: 0.15,
+      opacity: 0.10,
     });
 
     // ============================
@@ -837,6 +838,7 @@ utility.app.post("/handler", async (req, res) => {
         page.drawText(line, {
           x: topTableX + 8,
           y: yPos + (leftLines.length > 1 ? 6 - idx * 10 : 0),
+          // size: 9,
           size: 12,
           font,
           color: rgb(0, 0, 0),
@@ -847,6 +849,7 @@ utility.app.post("/handler", async (req, res) => {
       page.drawText(String(topTableData[i][1]), {
         x: topColSplit + 8,
         y: yPos,
+        // size: 9,
         size: 12,
         font,
         color: rgb(0, 0, 0),
@@ -861,7 +864,7 @@ utility.app.post("/handler", async (req, res) => {
     let mainTableY = startTableY;
     const mainTableWidth = topTableWidth;
     // const mainRowHeight = 21.5; // Increased for better spacing
-    const mainRowHeight = 25; // Increased for better spacing
+    const mainRowHeight = 18.5; // Increased for better spacing
     const labelColWidth = mainTableWidth * 0.72;
     const valueColX = mainTableX + labelColWidth;
 
@@ -894,10 +897,12 @@ utility.app.post("/handler", async (req, res) => {
       color: rgb(0, 0, 0),
     });
 
+    // page.drawText("tCO₂e", {
     page.drawText("tCO2e", {
       x: valueColX + 10,
       y: mainTableY - 15,
-      size: 13,
+      // size: 10,
+      size: 12,
       font: fontBold,
     });
 
@@ -914,7 +919,7 @@ utility.app.post("/handler", async (req, res) => {
           y: mainTableY - mainRowHeight,
           width: mainTableWidth,
           height: mainRowHeight,
-          color: rgb(0.94, 0.94, 0.94),
+          color: rgb(0.9, 0.9, 0.9),
         });
       }
       
@@ -935,6 +940,7 @@ utility.app.post("/handler", async (req, res) => {
         x: mainTableX + 6,
         y: mainTableY - 14,
         size: 12, // Back to size 9
+        // size: 9, // Back to size 9
         font: useFont,
       });
 
@@ -948,7 +954,7 @@ utility.app.post("/handler", async (req, res) => {
         page.drawText(formattedValue, {
           x: valueColX + 10,
           y: mainTableY - 14,
-          size: 12, // Back to size 9
+          size: 9, // Back to size 9
           font: useFont,
         });
       }
@@ -972,7 +978,6 @@ utility.app.post("/handler", async (req, res) => {
     res.status(500).json({ error: "PDF generation failed", detail: err.message });
   }
 });
-
 
 // ____________________________________________________________________________________________________________
 
