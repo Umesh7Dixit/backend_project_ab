@@ -574,6 +574,14 @@ utility.app.post('/recalculate_project_status',
   templates.recalculate_project_status
 );
 
+utility.app.post('/getAllProjectsByOrgID',
+  templates.getAllProjectsByOrgID
+);
+
+utility.app.post('/getUserInfoByUserID',
+  templates.getUserInfoByUserID
+);
+
 
 // utility.app.post('/userlogout' ,                                    utility.authenticateToken,  register.userlogout);
 

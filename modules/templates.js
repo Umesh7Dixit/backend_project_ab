@@ -1966,6 +1966,99 @@ class Templates {
 
 
 
+  
+  getAllProjectsByOrgID  = async (req, res) => {
+    try {
+
+      const { org_id} = req.body
+
+      const query = {
+        text: 'SELECT * FROM projects WHERE org_id = $1',
+        values: [org_id]
+      };
+
+      const result = await this.utility.sql.query(query);
+
+      if (!result.rows) {
+        return this.utility.response.init(res, false, "No response from database", {
+          error: "DATABASE_ERROR"
+        }, 500);
+      }
+
+      return this.utility.response.init(
+        res,
+        true,
+        "Fetching Projects successfully",
+        {
+          templates: result.rows,
+          count: result.rows.length
+        }
+      );
+
+    } catch (error) {
+      console.error('Error fetching templates:', error);
+      return this.utility.response.init(
+        res,
+        false,
+        "Internal server error while fetching templates",
+        {
+          error: "INTERNAL_SERVER_ERROR",
+          details: error.message
+        },
+        500
+      );
+    }
+  };
+
+
+
+
+  
+  getUserInfoByUserID  = async (req, res) => {
+    try {
+
+      const { user_id} = req.body
+
+      const query = {
+        text: 'SELECT u.full_name,  u.email,  u.phone_number,  o.org_name,  f.facility_name,  u.facility_id FROM users u LEFT JOIN organisation o ON u.org_id = o.org_id LEFT JOIN facilities f ON u.facility_id = f.facility_id WHERE u.user_id = $1',
+        values: [user_id]
+      };
+
+      const result = await this.utility.sql.query(query);
+
+      if (!result.rows) {
+        return this.utility.response.init(res, false, "No response from database", {
+          error: "DATABASE_ERROR"
+        }, 500);
+      }
+
+      return this.utility.response.init(
+        res,
+        true,
+        "Fetching Projects successfully",
+        {
+          templates: result.rows,
+          count: result.rows.length
+        }
+      );
+
+    } catch (error) {
+      console.error('Error fetching templates:', error);
+      return this.utility.response.init(
+        res,
+        false,
+        "Internal server error while fetching templates",
+        {
+          error: "INTERNAL_SERVER_ERROR",
+          details: error.message
+        },
+        500
+      );
+    }
+  };
+
+
+
 
 
 }
