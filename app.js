@@ -553,6 +553,9 @@ utility.app.post('/synchronize_project_approver',
 );
 
 utility.app.post('/create_new_project_request_with_file',
+  upload.fields([
+    {name:"p_file_url",maxCount:1}
+  ]),
   templates.create_new_project_request_with_file
 );
 

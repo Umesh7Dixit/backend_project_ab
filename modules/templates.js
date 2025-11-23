@@ -1,3 +1,5 @@
+const cloudinary = require("../config/cloudinary.js");
+
 class Templates {
   constructor(_utility) {
     this.utility = _utility;
@@ -1311,12 +1313,24 @@ class Templates {
   create_new_project_request_with_file = async (req, res) => {
     try {
 
-      const { p_creator_id, p_project_id, p_assignee_id, p_request_type,p_title, p_description, p_file_name, p_file_url, p_file_size } = req.body
+      const { p_creator_id, p_project_id, p_assignee_id, p_request_type,p_title, p_description, p_file_name, p_file_url, p_file_size } = req.body;
+
+      let fileURL = null;
+      
+      console.log("req.files?.p_file_url ->",req.files?.p_file_url)
+      let fileName = req.files?.p_file_url[0].originalname;
+      
+      if(req.files?.p_file_url?.length > 0){
+        const uploadRes = await cloudinary.uploader.upload(req.files.p_file_url[0].path,{resource_type:"raw"});
+        fileURL = uploadRes.secure_url;
+      }
 
       const query = {
         text: 'Select * from create_new_project_request_with_file($1,$2,$3,$4,$5,$6,$7,$8,$9)',
-        values: [p_creator_id, p_project_id, p_assignee_id, p_request_type,p_title, p_description, p_file_name, p_file_url, p_file_size]
+        values: [p_creator_id, p_project_id, p_assignee_id, p_request_type,p_title, p_description, fileName, fileURL, 15]
       };
+
+      console.log(query.values);
 
       const result = await this.utility.sql.query(query);
 
