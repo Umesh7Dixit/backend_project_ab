@@ -2172,6 +2172,54 @@ class Templates {
 
 
 
+  
+  
+  get_project_details_by_org  = async (req, res) => {
+    try {
+
+      const { org_id } = req.body
+
+      const query = {
+        text: 'SELECT p.*, f.facility_name, o.org_name FROM projects p LEFT JOIN facilities f ON p.facility_id = f.facility_id LEFT JOIN organisation o ON p.org_id = o.org_id WHERE p.org_id = $1;',
+        values: [org_id]
+      };
+
+      const result = await this.utility.sql.query(query);
+
+      if (!result.rows) {
+        return this.utility.response.init(res, false, "No response from database", {
+          error: "DATABASE_ERROR"
+        }, 500);
+      }
+
+      return this.utility.response.init(
+        res,
+        true,
+        "Fetching Projects successfully",
+        {
+          templates: result.rows,
+          count: result.rows.length
+        }
+      );
+
+    } catch (error) {
+      console.error('Error fetching templates:', error);
+      return this.utility.response.init(
+        res,
+        false,
+        "Internal server error while fetching templates",
+        {
+          error: "INTERNAL_SERVER_ERROR",
+          details: error.message
+        },
+        500
+      );
+    }
+  };
+
+
+
+
 
 
 }

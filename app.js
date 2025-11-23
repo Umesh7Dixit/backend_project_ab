@@ -595,6 +595,11 @@ utility.app.post('/get_project_category_totals',
 );
 
 
+utility.app.post('/get_project_details_by_org',
+  templates.get_project_details_by_org
+);
+
+
 // utility.app.post('/userlogout' ,                                    utility.authenticateToken,  register.userlogout);
 
 
