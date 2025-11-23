@@ -2118,7 +2118,7 @@ class Templates {
       const { project_id } = req.body
 
       const query = {
-        text: 'SELECT * FROM get_project_category_totals ($1)',
+        text: 'SELECT * FROM get_project_category_totals($1)',
         values: [project_id]
       };
 
