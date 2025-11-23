@@ -1003,6 +1003,271 @@ utility.app.post("/upload-csv", upload2.single("file"), async (req, res) => {
 
 
 
+// const { PDFDocument, StandardFonts, rgb } = require("pdf-lib");
+
+// utility.app.post("/generate_pdf", async (req, res) => {
+//   try {
+//     const body = req.body && Object.keys(req.body).length ? req.body : {};
+
+//     // No defaults - use only what's sent in the request
+//     const payload = {
+//       reportingPeriod: body.reportingPeriod,
+//       criteria: body.criteria,
+//       otherSources: body.otherSources,
+//       rows: body.rows || []
+//     };
+
+//     const pdfDoc = await PDFDocument.create();
+//     const page = pdfDoc.addPage([842, 595]);
+//     const { width, height } = page.getSize();
+
+//     const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+//     const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+
+//     // ============================
+//     // WATERMARK - "bsi." in center
+//     // ============================
+//     const watermarkText = "bsi.";
+//     const watermarkSize = 180;
+//     const watermarkX = width / 2 - 100;
+//     const watermarkY = height / 2 - 50;
+    
+//     page.drawText(watermarkText, {
+//       x: watermarkX,
+//       y: watermarkY,
+//       size: watermarkSize,
+//       font: fontBold,
+//       color: rgb(0.95, 0.95, 0.95),
+//       opacity: 0.10,
+//     });
+
+//     // ============================
+//     // HEADER "bsi."
+//     // ============================
+//     page.drawText("bsi", {
+//       x: 40,
+//       y: 545,
+//       size: 44,
+//       font: fontBold,
+//       color: rgb(0, 0, 0),
+//     });
+    
+//     // Draw the red dot after "bsi"
+//     page.drawCircle({
+//       x: 125,
+//       y: 551,
+//       size: 4,
+//       color: rgb(0.9, 0.1, 0.1),
+//     });
+
+//     // ============================
+//     // TOP INFO TABLE (Dynamic rows based on what's provided)
+//     // ============================
+//     const topTableX = 105;
+//     const topTableY = 500;
+//     const topTableWidth = width - 145;
+//     const topRowHeight = 26;
+
+//     // Build table data only from provided fields
+//     const topTableData = [];
+    
+//     if (payload.otherSources !== undefined && payload.otherSources !== null) {
+//       topTableData.push(["Indirect GHG emissions from\nother sources", payload.otherSources]);
+//     }
+    
+//     if (payload.criteria !== undefined && payload.criteria !== null) {
+//       topTableData.push(["Criteria for developing the organizational\nGHG Inventory:", payload.criteria]);
+//     }
+    
+//     if (payload.reportingPeriod !== undefined && payload.reportingPeriod !== null) {
+//       topTableData.push(["Reporting Period", payload.reportingPeriod]);
+//     }
+
+//     // Only draw top table if there's data
+//     if (topTableData.length > 0) {
+//       // Draw outer rectangle
+//       page.drawRectangle({
+//         x: topTableX,
+//         y: topTableY - topRowHeight * topTableData.length,
+//         width: topTableWidth,
+//         height: topRowHeight * topTableData.length,
+//         borderWidth: 1,
+//         borderColor: rgb(0, 0, 0),
+//       });
+
+//       // Draw horizontal lines
+//       for (let i = 1; i < topTableData.length; i++) {
+//         page.drawLine({
+//           start: { x: topTableX, y: topTableY - topRowHeight * i },
+//           end: { x: topTableX + topTableWidth, y: topTableY - topRowHeight * i },
+//           thickness: 1,
+//           color: rgb(0, 0, 0),
+//         });
+//       }
+
+//       // Draw vertical line separating columns
+//       const topColSplit = topTableX + topTableWidth * 0.45;
+//       page.drawLine({
+//         start: { x: topColSplit, y: topTableY },
+//         end: { x: topColSplit, y: topTableY - topRowHeight * topTableData.length },
+//         thickness: 1,
+//         color: rgb(0, 0, 0),
+//       });
+
+//       // Draw content
+//       for (let i = 0; i < topTableData.length; i++) {
+//         const yPos = topTableY - topRowHeight * i - 17;
+        
+//         // Left column text
+//         const leftLines = topTableData[i][0].split('\n');
+//         leftLines.forEach((line, idx) => {
+//           page.drawText(line, {
+//             x: topTableX + 8,
+//             y: yPos + (leftLines.length > 1 ? 6 - idx * 10 : 0),
+//             size: 12,
+//             font,
+//             color: rgb(0, 0, 0),
+//           });
+//         });
+
+//         // Right column text
+//         page.drawText(String(topTableData[i][1]), {
+//           x: topColSplit + 8,
+//           y: yPos,
+//           size: 12,
+//           font,
+//           color: rgb(0, 0, 0),
+//         });
+//       }
+//     }
+
+//     // ============================
+//     // MAIN EMISSIONS TABLE (Only if rows exist)
+//     // ============================
+//     if (payload.rows.length > 0) {
+//       const mainTableX = 105;
+//       const startTableY = 410;
+//       let mainTableY = startTableY;
+//       const mainTableWidth = topTableWidth;
+//       const mainRowHeight = 18.5;
+//       const labelColWidth = mainTableWidth * 0.72;
+//       const valueColX = mainTableX + labelColWidth;
+
+//       // Draw outer border
+//       const tableStartY = mainTableY;
+//       const totalRows = payload.rows.length + 1; // +1 for header
+      
+//       page.drawRectangle({
+//         x: mainTableX,
+//         y: mainTableY - mainRowHeight * totalRows,
+//         width: mainTableWidth,
+//         height: mainRowHeight * totalRows,
+//         borderWidth: 1,
+//         borderColor: rgb(0, 0, 0),
+//       });
+
+//       // Draw vertical line separating columns
+//       page.drawLine({
+//         start: { x: valueColX, y: tableStartY },
+//         end: { x: valueColX, y: mainTableY - mainRowHeight * totalRows },
+//         thickness: 1,
+//         color: rgb(0, 0, 0),
+//       });
+
+//       // Draw header row
+//       page.drawLine({
+//         start: { x: mainTableX, y: mainTableY },
+//         end: { x: mainTableX + mainTableWidth, y: mainTableY },
+//         thickness: 1,
+//         color: rgb(0, 0, 0),
+//       });
+
+//       page.drawText("tCO2e", {
+//         x: valueColX + 10,
+//         y: mainTableY - 15,
+//         size: 12,
+//         font: fontBold,
+//       });
+
+//       mainTableY -= mainRowHeight;
+
+//       // Draw all data rows
+//       for (let i = 0; i < payload.rows.length; i++) {
+//         const row = payload.rows[i];
+        
+//         // Draw gray background for header rows (before borders)
+//         if (row.grayBg) {
+//           page.drawRectangle({
+//             x: mainTableX,
+//             y: mainTableY - mainRowHeight,
+//             width: mainTableWidth,
+//             height: mainRowHeight,
+//             color: rgb(0.9, 0.9, 0.9),
+//           });
+//         }
+        
+//         // Draw horizontal line
+//         page.drawLine({
+//           start: { x: mainTableX, y: mainTableY },
+//           end: { x: mainTableX + mainTableWidth, y: mainTableY },
+//           thickness: 0.5,
+//           color: rgb(0, 0, 0),
+//         });
+
+//         // Only bold for rows where bold: true
+//         const useBold = row.bold === true;
+//         const useFont = useBold ? fontBold : font;
+
+//         // Draw label
+//         page.drawText(String(row.label), {
+//           x: mainTableX + 6,
+//           y: mainTableY - 14,
+//           size: 12,
+//           font: useFont,
+//         });
+
+//         // Draw value (only if not empty)
+//         if (row.value !== "" && row.value !== null && row.value !== undefined) {
+//           const formattedValue = Number(row.value).toLocaleString("en-US", {
+//             minimumFractionDigits: 1,
+//             maximumFractionDigits: 1,
+//           });
+
+//           page.drawText(formattedValue, {
+//             x: valueColX + 10,
+//             y: mainTableY - 14,
+//             size: 9,
+//             font: useFont,
+//           });
+//         }
+
+//         mainTableY -= mainRowHeight;
+//       }
+//     }
+
+//     const pdfBytes = await pdfDoc.save();
+
+//     // Generate filename with timestamp
+//     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+//     const filename = `GHG-Emissions-Report-${timestamp}.pdf`;
+
+//     res.setHeader("Content-Type", "application/pdf");
+//     res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+//     res.setHeader("Content-Length", pdfBytes.length);
+    
+//     res.send(Buffer.from(pdfBytes));
+//   } catch (err) {
+//     console.log(err);
+//     res.status(500).json({ error: "PDF generation failed", detail: err.message });
+//   }
+// });
+
+
+
+
+
+
+
 const { PDFDocument, StandardFonts, rgb } = require("pdf-lib");
 
 utility.app.post("/generate_pdf", async (req, res) => {
@@ -1027,7 +1292,8 @@ utility.app.post("/generate_pdf", async (req, res) => {
     // ============================
     // WATERMARK - "bsi." in center
     // ============================
-    const watermarkText = "bsi.";
+    // const watermarkText = "bsi.";
+    const watermarkText = "verified";
     const watermarkSize = 180;
     const watermarkX = width / 2 - 100;
     const watermarkY = height / 2 - 50;
@@ -1037,14 +1303,15 @@ utility.app.post("/generate_pdf", async (req, res) => {
       y: watermarkY,
       size: watermarkSize,
       font: fontBold,
-      color: rgb(0.95, 0.95, 0.95),
-      opacity: 0.10,
+      color: rgb(0.85, 0.85, 0.85),
+      opacity: 0.3,
     });
 
     // ============================
     // HEADER "bsi."
     // ============================
-    page.drawText("bsi", {
+    // page.drawText("bsi", {
+    page.drawText("carbon scan.ai", {
       x: 40,
       y: 545,
       size: 44,
@@ -1054,7 +1321,8 @@ utility.app.post("/generate_pdf", async (req, res) => {
     
     // Draw the red dot after "bsi"
     page.drawCircle({
-      x: 125,
+      // x: 125,
+      x: 350,
       y: 551,
       size: 4,
       color: rgb(0.9, 0.1, 0.1),
@@ -1202,7 +1470,7 @@ utility.app.post("/generate_pdf", async (req, res) => {
             y: mainTableY - mainRowHeight,
             width: mainTableWidth,
             height: mainRowHeight,
-            color: rgb(0.9, 0.9, 0.9),
+            color: rgb(0.75, 0.75, 0.75),
           });
         }
         
