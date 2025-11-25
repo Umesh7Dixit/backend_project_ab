@@ -924,7 +924,7 @@ class Templates {
 
       const query = {
         text: 'SELECT * FROM   get_project_review_data($1,$2)',
-        values: [p_project_id,p_scope_name]
+        values: [p_project_id, p_scope_name]
       };
 
       const result = await this.utility.sql.query(query);
@@ -962,14 +962,14 @@ class Templates {
 
 
 
-  submit_project_for_approval  = async (req, res) => {
+  submit_project_for_approval = async (req, res) => {
     try {
 
       const { p_project_id, p_project_user_ids } = req.body
 
       const query = {
         text: 'SELECT * FROM   submit_project_for_approval($1,$2)',
-        values: [p_project_id,p_project_user_ids]
+        values: [p_project_id, p_project_user_ids]
       };
 
       const result = await this.utility.sql.query(query);
@@ -1006,7 +1006,7 @@ class Templates {
   };
 
 
-  get_approval_status_for_project  = async (req, res) => {
+  get_approval_status_for_project = async (req, res) => {
     try {
 
       const { p_project_id } = req.body
@@ -1050,7 +1050,7 @@ class Templates {
   };
 
 
-  upload_document_for_activity  = async (req, res) => {
+  upload_document_for_activity = async (req, res) => {
     try {
 
       const { p_project_id, p_user_id, p_activity_id, p_file_name, p_file_url, p_file_size } = req.body
@@ -1093,10 +1093,10 @@ class Templates {
     }
   };
 
-  get_project_members_for_approval  = async (req, res) => {
+  get_project_members_for_approval = async (req, res) => {
     try {
 
-      const { p_project_id} = req.body
+      const { p_project_id } = req.body
 
       const query = {
         text: 'SELECT * FROM   get_project_members_for_approval($1)',
@@ -1136,10 +1136,10 @@ class Templates {
     }
   };
 
-  get_project_overall_completion  = async (req, res) => {
+  get_project_overall_completion = async (req, res) => {
     try {
 
-      const { p_project_id} = req.body
+      const { p_project_id } = req.body
 
       const query = {
         text: 'SELECT * FROM   get_project_overall_completion($1)',
@@ -1226,7 +1226,7 @@ class Templates {
     try {
 
       const { p_project_id, p_role_name, p_new_approver_ids } = req.body
-      
+
       const query = {
         text: 'Select * from synchronize_project_approver($1,$2,$3)',
         values: [p_project_id, p_role_name, p_new_approver_ids]
@@ -1313,21 +1313,21 @@ class Templates {
   create_new_project_request_with_file = async (req, res) => {
     try {
 
-      const { p_creator_id, p_project_id, p_assignee_id, p_request_type,p_title, p_description, p_file_name, p_file_url, p_file_size } = req.body;
+      const { p_creator_id, p_project_id, p_assignee_id, p_request_type, p_title, p_description, p_file_name, p_file_url, p_file_size } = req.body;
 
       let fileURL = null;
-      
-      console.log("req.files?.p_file_url ->",req.files?.p_file_url)
+
+      console.log("req.files?.p_file_url ->", req.files?.p_file_url)
       let fileName = req.files?.p_file_url[0].originalname;
-      
-      if(req.files?.p_file_url?.length > 0){
-        const uploadRes = await cloudinary.uploader.upload(req.files.p_file_url[0].path,{resource_type:"raw"});
+
+      if (req.files?.p_file_url?.length > 0) {
+        const uploadRes = await cloudinary.uploader.upload(req.files.p_file_url[0].path, { resource_type: "raw" });
         fileURL = uploadRes.secure_url;
       }
 
       const query = {
         text: 'Select * from create_new_project_request_with_file($1,$2,$3,$4,$5,$6,$7,$8,$9)',
-        values: [p_creator_id, p_project_id, p_assignee_id, p_request_type,p_title, p_description, fileName, fileURL, 15]
+        values: [p_creator_id, p_project_id, p_assignee_id, p_request_type, p_title, p_description, fileName, fileURL, 15]
       };
 
       console.log(query.values);
@@ -1375,7 +1375,7 @@ class Templates {
 
       const query = {
         text: 'Select * from get_project_total_emissions_summary($1)',
-        values: [ p_project_id]
+        values: [p_project_id]
       };
 
       const result = await this.utility.sql.query(query);
@@ -1414,10 +1414,10 @@ class Templates {
 
 
 
-  get_available_users_for_project_team  = async (req, res) => {
+  get_available_users_for_project_team = async (req, res) => {
     try {
 
-      const { p_project_id} = req.body
+      const { p_project_id } = req.body
 
       const query = {
         text: 'SELECT * FROM   get_available_users_for_project_team($1)',
@@ -1607,11 +1607,11 @@ class Templates {
   update_project_member_permission = async (req, res) => {
     try {
 
-      const { p_project_id, p_member_user_id,p_new_permission_level } = req.body
+      const { p_project_id, p_member_user_id, p_new_permission_level } = req.body
 
       const query = {
         text: 'SELECT * FROM  update_project_member_permission($1,$2,$3)',
-        values: [p_project_id, p_member_user_id,p_new_permission_level]
+        values: [p_project_id, p_member_user_id, p_new_permission_level]
       };
 
       const result = await this.utility.sql.query(query);
@@ -1659,7 +1659,7 @@ class Templates {
 
       const query = {
         text: 'Select * from add_new_member_to_project($1,$2,$3,$4)',
-        values: [p_project_id, p_user_id,p_role_name, p_permission_level]
+        values: [p_project_id, p_user_id, p_role_name, p_permission_level]
       };
 
       const result = await this.utility.sql.query(query);
@@ -1888,11 +1888,11 @@ class Templates {
 
 
 
-  
-  remove_project_auditor  = async (req, res) => {
+
+  remove_project_auditor = async (req, res) => {
     try {
 
-      const { p_project_id, p_auditor_id, p_requester_id} = req.body
+      const { p_project_id, p_auditor_id, p_requester_id } = req.body
 
       const query = {
         text: 'SELECT * FROM remove_project_auditor($1,$2,$3)',
@@ -1934,11 +1934,11 @@ class Templates {
 
 
 
-  
-  recalculate_project_status  = async (req, res) => {
+
+  recalculate_project_status = async (req, res) => {
     try {
 
-      const { p_project_id} = req.body
+      const { p_project_id } = req.body
 
       const query = {
         text: 'SELECT * FROM recalculate_project_status($1)',
@@ -1980,11 +1980,11 @@ class Templates {
 
 
 
-  
-  getAllProjectsByOrgID  = async (req, res) => {
+
+  getAllProjectsByOrgID = async (req, res) => {
     try {
 
-      const { org_id} = req.body
+      const { org_id } = req.body
 
       const query = {
         text: 'SELECT * FROM projects WHERE org_id = $1',
@@ -2027,11 +2027,11 @@ class Templates {
 
 
 
-  
-  getUserInfoByUserID  = async (req, res) => {
+
+  getUserInfoByUserID = async (req, res) => {
     try {
 
-      const { user_id} = req.body
+      const { user_id } = req.body
 
       const query = {
         text: 'SELECT u.full_name,  u.email,  u.phone_number,  o.org_name,  f.facility_name,  u.facility_id FROM users u LEFT JOIN organisation o ON u.org_id = o.org_id LEFT JOIN facilities f ON u.facility_id = f.facility_id WHERE u.user_id = $1',
@@ -2076,12 +2076,12 @@ class Templates {
 
 
 
-  
-  
-  getAllProjectsByFacilityID  = async (req, res) => {
+
+
+  getAllProjectsByFacilityID = async (req, res) => {
     try {
 
-      const { project_id} = req.body
+      const { project_id } = req.body
 
       const query = {
         text: 'SELECT * FROM projects WHERE project_id = $1',
@@ -2124,9 +2124,9 @@ class Templates {
 
 
 
-  
-  
-  get_project_category_totals  = async (req, res) => {
+
+
+  get_project_category_totals = async (req, res) => {
     try {
 
       const { project_id } = req.body
@@ -2172,9 +2172,9 @@ class Templates {
 
 
 
-  
-  
-  get_project_details_by_org  = async (req, res) => {
+
+
+  get_project_details_by_org = async (req, res) => {
     try {
 
       const { org_id } = req.body
@@ -2220,16 +2220,16 @@ class Templates {
 
 
 
-  
-  
-  get_project_portfolio_list  = async (req, res) => {
+
+
+  get_project_portfolio_list = async (req, res) => {
     try {
 
-      const { p_user_id,p_view_type } = req.body
+      const { p_user_id, p_view_type } = req.body
 
       const query = {
         text: 'SELECT  * FROM get_project_portfolio_list($1,$2);',
-        values: [p_user_id,p_view_type]
+        values: [p_user_id, p_view_type]
       };
 
       const result = await this.utility.sql.query(query);
@@ -2267,8 +2267,8 @@ class Templates {
 
 
 
-  
-  
+
+
   // get_project_portfolio_stats  = async (req, res) => {
   //   try {
 
@@ -2312,9 +2312,9 @@ class Templates {
   //   }
   // };
 
-  
-  
-  get_task_header  = async (req, res) => {
+
+
+  get_task_header = async (req, res) => {
     try {
 
       const { p_task_id } = req.body
@@ -2358,9 +2358,9 @@ class Templates {
   };
 
 
-  
-  
-  get_assigned_tasks_for_user  = async (req, res) => {
+
+
+  get_assigned_tasks_for_user = async (req, res) => {
     try {
 
       const { p_user_id, p_status_filter } = req.body
@@ -2406,9 +2406,9 @@ class Templates {
 
 
 
-  
-  
-  get_task_conversation  = async (req, res) => {
+
+
+  get_task_conversation = async (req, res) => {
     try {
 
       const { p_task_id } = req.body
@@ -2456,16 +2456,16 @@ class Templates {
 
 
 
-  
-  
-  add_task_comment  = async (req, res) => {
+
+
+  add_task_comment = async (req, res) => {
     try {
 
-      const { p_task_id, p_user_id, p_comment_text, p_file_name ,p_file_url, p_file_size } = req.body
+      const { p_task_id, p_user_id, p_comment_text, p_file_name, p_file_url, p_file_size } = req.body
 
       const query = {
         text: 'SELECT  * FROM add_task_comment ($1,$2,$3,$4,$5,$6);',
-        values: [p_task_id, p_user_id, p_comment_text, p_file_name ,p_file_url, p_file_size]
+        values: [p_task_id, p_user_id, p_comment_text, p_file_name, p_file_url, p_file_size]
       };
 
       const result = await this.utility.sql.query(query);
