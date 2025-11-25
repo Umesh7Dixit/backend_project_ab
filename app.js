@@ -506,7 +506,6 @@ utility.app.put('/templates/update',
 
 
 
-
 utility.app.post('/getorg_name_and_id',
   // utility.authenticateToken,
   // validation.validate(validationSchemas.saveProjectActivityConfiguration),
@@ -531,7 +530,7 @@ utility.app.post('/remove_member_from_project',
 
 
 utility.app.post('/get_project_members_for_approval',
-  templates.get_project_members_for_approval 
+  templates.get_project_members_for_approval
 );
 
 
@@ -554,7 +553,7 @@ utility.app.post('/synchronize_project_approver',
 
 utility.app.post('/create_new_project_request_with_file',
   upload.fields([
-    {name:"p_file_url",maxCount:1}
+    { name: "p_file_url", maxCount: 1 }
   ]),
   templates.create_new_project_request_with_file
 );
@@ -599,6 +598,9 @@ utility.app.post('/get_project_details_by_org',
   templates.get_project_details_by_org
 );
 
+utility.app.post('/project/get_user_project_request_summary',
+  projectActivities.get_user_project_request_summary
+);
 
 // utility.app.post('/userlogout' ,                                    utility.authenticateToken,  register.userlogout);
 
@@ -617,7 +619,7 @@ utility.app.post('/get_project_details_by_org',
 
 // ______________Upload Functionality________________________________
 
- 
+
 
 
 
@@ -627,102 +629,102 @@ const multer = require("multer");
 
 
 const upload2 = multer({ storage: multer.memoryStorage() });
- 
+
 
 const { Readable } = require("stream");
 
 utility.app.post("/upload-csv", upload2.single("file"), async (req, res) => {
-    try {
-        if (!req.file) {
-            return res.status(400).json({ message: "File not found" });
-        }
-
-        let raw = req.file.buffer.toString("latin1");
-
-         
-        raw = raw.replace(/^\uFEFF/, "");
-
-        raw = raw.replace(/\u00A0/g, " ");
-
-        let delimiter = raw.includes("\t") ? "\t" : ",";
-
-        const results = [];
-
-         Readable.from(raw.split(/\r?\n/))
-    .pipe(
-        csv({
-            separator: delimiter,
-            mapHeaders: ({ header }) =>
-                header
-                    .trim()
-                    .toLowerCase()
-                    .replace(/[\s]+/g, "_")
-        })
-    )
-
-            .on("data", (row) => {
-                
-                const clean = {};
-                Object.keys(row).forEach((k) => {
-                    let key = k.trim().toLowerCase().replace(/[\s]+/g, "_");
-                    clean[key] = (row[k] || "").toString().trim();
-                });
-
-              
-                const obj = {
-                    project_activity_id: Number(clean.project_activity_id) || null,
-                    main_category: clean.main_category || "",
-                    sub_category: clean.sub_category || "",
-                    activity: clean.activity || "",
-                    selection_1: clean.selection_1 || "",
-                    selection_2: clean.selection_2 || "",
-                    unit: clean.unit || "",
-                    monthly_data: {},
-                    subcategory_id: 124
-                };
-
-                 
-                Object.keys(clean).forEach((key) => {
-                    if (
-                        ![
-                            "project_activity_id",
-                            "main_category",
-                            "sub_category",
-                            "activity",
-                            "selection_1",
-                            "selection_2",
-                            "unit"
-                        ].includes(key)
-                    ) {
-                        if (clean[key] !== "") {
-                            obj.monthly_data[key.replace(/-/g, " ")] = {
-                                quantity: Number(clean[key]) || 0
-                            };
-                        }
-                    }
-                });
-
-                results.push(obj);
-            })
-            .on("end", () => {
-                res.json({
-                    issuccessful: true,
-                    message: "Data Parsed successfully",
-                    data: {
-                        templates: results,
-                        count: results.length
-                    }
-                });
-            });
-
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({
-            issuccessful: false,
-            message: "Internal server error",
-            error: err.message
-        });
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: "File not found" });
     }
+
+    let raw = req.file.buffer.toString("latin1");
+
+
+    raw = raw.replace(/^\uFEFF/, "");
+
+    raw = raw.replace(/\u00A0/g, " ");
+
+    let delimiter = raw.includes("\t") ? "\t" : ",";
+
+    const results = [];
+
+    Readable.from(raw.split(/\r?\n/))
+      .pipe(
+        csv({
+          separator: delimiter,
+          mapHeaders: ({ header }) =>
+            header
+              .trim()
+              .toLowerCase()
+              .replace(/[\s]+/g, "_")
+        })
+      )
+
+      .on("data", (row) => {
+
+        const clean = {};
+        Object.keys(row).forEach((k) => {
+          let key = k.trim().toLowerCase().replace(/[\s]+/g, "_");
+          clean[key] = (row[k] || "").toString().trim();
+        });
+
+
+        const obj = {
+          project_activity_id: Number(clean.project_activity_id) || null,
+          main_category: clean.main_category || "",
+          sub_category: clean.sub_category || "",
+          activity: clean.activity || "",
+          selection_1: clean.selection_1 || "",
+          selection_2: clean.selection_2 || "",
+          unit: clean.unit || "",
+          monthly_data: {},
+          subcategory_id: 124
+        };
+
+
+        Object.keys(clean).forEach((key) => {
+          if (
+            ![
+              "project_activity_id",
+              "main_category",
+              "sub_category",
+              "activity",
+              "selection_1",
+              "selection_2",
+              "unit"
+            ].includes(key)
+          ) {
+            if (clean[key] !== "") {
+              obj.monthly_data[key.replace(/-/g, " ")] = {
+                quantity: Number(clean[key]) || 0
+              };
+            }
+          }
+        });
+
+        results.push(obj);
+      })
+      .on("end", () => {
+        res.json({
+          issuccessful: true,
+          message: "Data Parsed successfully",
+          data: {
+            templates: results,
+            count: results.length
+          }
+        });
+      });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      issuccessful: false,
+      message: "Internal server error",
+      error: err.message
+    });
+  }
 });
 
 
@@ -731,7 +733,7 @@ utility.app.post("/upload-csv", upload2.single("file"), async (req, res) => {
 
 // ____________________________________________________________________________________________________________
 
- 
+
 
 // const { PDFDocument, StandardFonts, rgb } = require("pdf-lib");
 
@@ -780,7 +782,7 @@ utility.app.post("/upload-csv", upload2.single("file"), async (req, res) => {
 //     const watermarkSize = 180;
 //     const watermarkX = width / 2 - 100;
 //     const watermarkY = height / 2 - 50;
-    
+
 //     page.drawText(watermarkText, {
 //       x: watermarkX,
 //       y: watermarkY,
@@ -801,7 +803,7 @@ utility.app.post("/upload-csv", upload2.single("file"), async (req, res) => {
 //       font: fontBold,
 //       color: rgb(0, 0, 0),
 //     });
-    
+
 //     // Draw the red dot after "bsi"
 //     page.drawCircle({
 //       x: 125,
@@ -856,7 +858,7 @@ utility.app.post("/upload-csv", upload2.single("file"), async (req, res) => {
 //     // Draw content
 //     for (let i = 0; i < topTableData.length; i++) {
 //       const yPos = topTableY - topRowHeight * i - 17;
-      
+
 //       // Left column text
 //       const leftLines = topTableData[i][0].split('\n');
 //       leftLines.forEach((line, idx) => {
@@ -896,7 +898,7 @@ utility.app.post("/upload-csv", upload2.single("file"), async (req, res) => {
 //     // Draw outer border
 //     const tableStartY = mainTableY;
 //     const totalRows = payload.rows.length + 1; // +1 for header
-    
+
 //     page.drawRectangle({
 //       x: mainTableX,
 //       y: mainTableY - mainRowHeight * totalRows,
@@ -936,7 +938,7 @@ utility.app.post("/upload-csv", upload2.single("file"), async (req, res) => {
 //     // Draw all data rows
 //     for (let i = 0; i < payload.rows.length; i++) {
 //       const row = payload.rows[i];
-      
+
 //       // Draw gray background for header rows (before borders)
 //       if (row.grayBg) {
 //         page.drawRectangle({
@@ -947,7 +949,7 @@ utility.app.post("/upload-csv", upload2.single("file"), async (req, res) => {
 //           color: rgb(0.9, 0.9, 0.9),
 //         });
 //       }
-      
+
 //       // Draw horizontal line
 //       page.drawLine({
 //         start: { x: mainTableX, y: mainTableY },
@@ -996,7 +998,7 @@ utility.app.post("/upload-csv", upload2.single("file"), async (req, res) => {
 //     res.setHeader("Content-Type", "application/pdf");
 //     res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
 //     res.setHeader("Content-Length", pdfBytes.length);
-    
+
 //     res.send(Buffer.from(pdfBytes));
 //   } catch (err) {
 //     console.log(err);
@@ -1039,7 +1041,7 @@ utility.app.post("/upload-csv", upload2.single("file"), async (req, res) => {
 //     const watermarkSize = 180;
 //     const watermarkX = width / 2 - 100;
 //     const watermarkY = height / 2 - 50;
-    
+
 //     page.drawText(watermarkText, {
 //       x: watermarkX,
 //       y: watermarkY,
@@ -1059,7 +1061,7 @@ utility.app.post("/upload-csv", upload2.single("file"), async (req, res) => {
 //       font: fontBold,
 //       color: rgb(0, 0, 0),
 //     });
-    
+
 //     // Draw the red dot after "bsi"
 //     page.drawCircle({
 //       x: 125,
@@ -1078,15 +1080,15 @@ utility.app.post("/upload-csv", upload2.single("file"), async (req, res) => {
 
 //     // Build table data only from provided fields
 //     const topTableData = [];
-    
+
 //     if (payload.otherSources !== undefined && payload.otherSources !== null) {
 //       topTableData.push(["Indirect GHG emissions from\nother sources", payload.otherSources]);
 //     }
-    
+
 //     if (payload.criteria !== undefined && payload.criteria !== null) {
 //       topTableData.push(["Criteria for developing the organizational\nGHG Inventory:", payload.criteria]);
 //     }
-    
+
 //     if (payload.reportingPeriod !== undefined && payload.reportingPeriod !== null) {
 //       topTableData.push(["Reporting Period", payload.reportingPeriod]);
 //     }
@@ -1125,7 +1127,7 @@ utility.app.post("/upload-csv", upload2.single("file"), async (req, res) => {
 //       // Draw content
 //       for (let i = 0; i < topTableData.length; i++) {
 //         const yPos = topTableY - topRowHeight * i - 17;
-        
+
 //         // Left column text
 //         const leftLines = topTableData[i][0].split('\n');
 //         leftLines.forEach((line, idx) => {
@@ -1164,7 +1166,7 @@ utility.app.post("/upload-csv", upload2.single("file"), async (req, res) => {
 //       // Draw outer border
 //       const tableStartY = mainTableY;
 //       const totalRows = payload.rows.length + 1; // +1 for header
-      
+
 //       page.drawRectangle({
 //         x: mainTableX,
 //         y: mainTableY - mainRowHeight * totalRows,
@@ -1202,7 +1204,7 @@ utility.app.post("/upload-csv", upload2.single("file"), async (req, res) => {
 //       // Draw all data rows
 //       for (let i = 0; i < payload.rows.length; i++) {
 //         const row = payload.rows[i];
-        
+
 //         // Draw gray background for header rows (before borders)
 //         if (row.grayBg) {
 //           page.drawRectangle({
@@ -1213,7 +1215,7 @@ utility.app.post("/upload-csv", upload2.single("file"), async (req, res) => {
 //             color: rgb(0.9, 0.9, 0.9),
 //           });
 //         }
-        
+
 //         // Draw horizontal line
 //         page.drawLine({
 //           start: { x: mainTableX, y: mainTableY },
@@ -1262,7 +1264,7 @@ utility.app.post("/upload-csv", upload2.single("file"), async (req, res) => {
 //     res.setHeader("Content-Type", "application/pdf");
 //     res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
 //     res.setHeader("Content-Length", pdfBytes.length);
-    
+
 //     res.send(Buffer.from(pdfBytes));
 //   } catch (err) {
 //     console.log(err);
@@ -1305,7 +1307,7 @@ utility.app.post("/generate_pdf", async (req, res) => {
     const watermarkSize = 180;
     const watermarkX = width / 2 - 100;
     const watermarkY = height / 2 - 50;
-    
+
     page.drawText(watermarkText, {
       x: watermarkX,
       y: watermarkY,
@@ -1326,7 +1328,7 @@ utility.app.post("/generate_pdf", async (req, res) => {
       font: fontBold,
       color: rgb(0, 0, 0),
     });
-    
+
     // Draw the red dot after "bsi"
     page.drawCircle({
       // x: 125,
@@ -1346,15 +1348,15 @@ utility.app.post("/generate_pdf", async (req, res) => {
 
     // Build table data only from provided fields
     const topTableData = [];
-    
+
     if (payload.otherSources !== undefined && payload.otherSources !== null) {
       topTableData.push(["Indirect GHG emissions from\nother sources", payload.otherSources]);
     }
-    
+
     if (payload.criteria !== undefined && payload.criteria !== null) {
       topTableData.push(["Criteria for developing the organizational\nGHG Inventory:", payload.criteria]);
     }
-    
+
     if (payload.reportingPeriod !== undefined && payload.reportingPeriod !== null) {
       topTableData.push(["Reporting Period", payload.reportingPeriod]);
     }
@@ -1393,7 +1395,7 @@ utility.app.post("/generate_pdf", async (req, res) => {
       // Draw content
       for (let i = 0; i < topTableData.length; i++) {
         const yPos = topTableY - topRowHeight * i - 17;
-        
+
         // Left column text
         const leftLines = topTableData[i][0].split('\n');
         leftLines.forEach((line, idx) => {
@@ -1432,7 +1434,7 @@ utility.app.post("/generate_pdf", async (req, res) => {
       // Draw outer border
       const tableStartY = mainTableY;
       const totalRows = payload.rows.length + 1; // +1 for header
-      
+
       page.drawRectangle({
         x: mainTableX,
         y: mainTableY - mainRowHeight * totalRows,
@@ -1470,7 +1472,7 @@ utility.app.post("/generate_pdf", async (req, res) => {
       // Draw all data rows
       for (let i = 0; i < payload.rows.length; i++) {
         const row = payload.rows[i];
-        
+
         // Draw gray background for header rows (before borders)
         if (row.grayBg) {
           page.drawRectangle({
@@ -1481,7 +1483,7 @@ utility.app.post("/generate_pdf", async (req, res) => {
             color: rgb(0.75, 0.75, 0.75),
           });
         }
-        
+
         // Draw horizontal line
         page.drawLine({
           start: { x: mainTableX, y: mainTableY },
@@ -1530,7 +1532,7 @@ utility.app.post("/generate_pdf", async (req, res) => {
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
     res.setHeader("Content-Length", pdfBytes.length);
-    
+
     res.send(Buffer.from(pdfBytes));
   } catch (err) {
     console.log(err);

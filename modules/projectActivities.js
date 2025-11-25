@@ -974,10 +974,7 @@ class ProjectActivities {
   get_assignable_users_for_org = async (req, res) => {
     try {
 
-      const {
-        org_id
-
-      } = req.body;
+      const { org_id } = req.body;
 
       const query = {
         // text: `SELECT * FROM get_assignable_users_for_org(  $1  )`,
@@ -1018,8 +1015,43 @@ WHERE
   };
 
 
+  get_user_project_request_summary = async (req, res) => {
+    try {
+      const { p_user_id } = req.body;
+      const query = {
+        text: 'SELECT * FROM get_user_project_request_summary($1)',
+        values: [p_user_id]
+      }
+      const result = await this.utility.sql.query(query);
+      if (!result.rows) {
+        return this.utility.response.init(res, false, "No response from database", {
+          error: "DATABASE_ERROR"
+        }, 500);
+      }
+      const summaryData = result.rows[0];
+      return this.utility.response.init(
+        res,
+        true,
+        "User project request summary fetched successfully",
+        {
+          summary: summaryData
+        }
+      );
 
-
+    } catch (error) {
+      console.error('Error fetching user project request summary', error);
+      return this.utility.response.init(
+        res,
+        false,
+        "Internal server error while fetching user project request summary",
+        {
+          error: "INTERNAL_SERVER_ERROR",
+          details: error.message
+        },
+        500
+      );
+    }
+  };
 
 
   get_templatesBy_parentID = async (req, res) => {
