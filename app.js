@@ -602,6 +602,11 @@ utility.app.post('/project/get_user_project_request_summary',
   projectActivities.get_user_project_request_summary
 );
 
+utility.app.post('/project/get_project_portfolio_stats',
+  projectActivities.get_project_portfolio_stats
+);
+
+
 // utility.app.post('/userlogout' ,                                    utility.authenticateToken,  register.userlogout);
 
 

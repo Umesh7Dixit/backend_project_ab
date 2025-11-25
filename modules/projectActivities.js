@@ -1053,6 +1053,43 @@ WHERE
     }
   };
 
+  get_project_portfolio_stats = async (req, res) => {
+    try {
+      const { p_user_id } = req.body;
+      
+      const query = {
+        text: 'SELECT * FROM get_project_portfolio_stats($1)',
+        values: [p_user_id]
+      }
+      const result = await this.utility.sql.query(query);
+      if (!result.rows) {
+        return this.utility.response.init(res, false, "No response from database", {
+          error: "DATABASE_ERROR"
+        }, 500);
+      }
+      const statsData = result.rows[0];
+      return this.utility.response.init(
+        res,
+        true,
+        "Project portfolio stats fetched successfully",
+        {
+          stats: statsData
+        }
+      );
+    } catch (error) {
+      console.error('Error fetching project portfolio stats', error);
+      return this.utility.response.init(
+        res,
+        false,
+        "Internal server error while fetching project portfolio stats",
+        {
+          error: "INTERNAL_SERVER_ERROR",
+          details: error.message
+        },
+        500
+      );
+    }
+  }
 
   get_templatesBy_parentID = async (req, res) => {
     try {
