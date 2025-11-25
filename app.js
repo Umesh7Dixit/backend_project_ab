@@ -607,6 +607,37 @@ utility.app.post('/project/get_project_portfolio_stats',
 );
 
 
+utility.app.post('/get_project_portfolio_list',
+  templates.get_project_portfolio_list
+);
+
+
+// utility.app.post('/get_project_portfolio_stats',
+//   templates.get_project_portfolio_stats
+// );
+
+
+utility.app.post('/get_task_header',
+  templates.get_task_header
+);
+
+
+utility.app.post('/get_assigned_tasks_for_user',
+  templates.get_assigned_tasks_for_user
+);
+
+
+
+utility.app.post('/get_task_conversation',
+  templates.get_task_conversation
+);
+
+
+utility.app.post('/add_task_comment',
+  templates.add_task_comment
+);
+
+
 // utility.app.post('/userlogout' ,                                    utility.authenticateToken,  register.userlogout);
 
 
