@@ -208,7 +208,7 @@ utility.app.get('/categories/subcategories',
 );
 
 utility.app.post('/projects/initialize',
-  // utility.authenticateToken,
+  utility.authenticateToken,
   // validation.validate(validationSchemas.initializeNewProject),
   projectActivities.InitializeNewProject
 );
@@ -675,37 +675,54 @@ utility.app.post("/upload-csv", upload2.single("file"), async (req, res) => {
       return res.status(400).json({ message: "File not found" });
     }
 
-    let raw = req.file.buffer.toString("latin1");
+    let raw = req.file.buffer.toString("utf8")
+      .replace(/^\uFEFF/, "")
+      .replace(/\u00A0/g, " ");
 
-
-    raw = raw.replace(/^\uFEFF/, "");
-
-    raw = raw.replace(/\u00A0/g, " ");
-
-    let delimiter = raw.includes("\t") ? "\t" : ",";
+    const delimiter = raw.includes("\t") ? "\t" : ",";
 
     const results = [];
 
-    Readable.from(raw.split(/\r?\n/))
+    const cleanKey = (str = "") =>
+      str
+        .normalize("NFKD")
+        .replace(/[^\w\s-]/g, "")
+        .replace(/[\s]+/g, " ")
+        .replace(/[_-]+/g, "_")
+        .trim();
+
+    const MONTHS = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+
+    const formatToMonth = (key = "") => {
+      const match = key.match(/([A-Za-z]{3})[_\s-]?(\d{2,4})/);
+      if (!match) return null;
+      let month = match[1].toUpperCase();
+      let year = match[2];
+      if (!MONTHS.includes(month)) return null;
+      month = month.charAt(0) + month.slice(1).toLowerCase();
+      return `${month} ${year}`;
+    };
+
+
+    Readable.from(raw)
       .pipe(
         csv({
           separator: delimiter,
           mapHeaders: ({ header }) =>
             header
-              .trim()
+              .normalize("NFKD")
               .toLowerCase()
+              .replace(/[^\w\s]/g, " ")
               .replace(/[\s]+/g, "_")
+              .trim()
         })
       )
-
       .on("data", (row) => {
-
         const clean = {};
         Object.keys(row).forEach((k) => {
-          let key = k.trim().toLowerCase().replace(/[\s]+/g, "_");
+          const key = cleanKey(k);
           clean[key] = (row[k] || "").toString().trim();
         });
-
 
         const obj = {
           project_activity_id: Number(clean.project_activity_id) || null,
@@ -716,9 +733,9 @@ utility.app.post("/upload-csv", upload2.single("file"), async (req, res) => {
           selection_2: clean.selection_2 || "",
           unit: clean.unit || "",
           monthly_data: {},
+          // TODO: Why this 124?
           subcategory_id: 124
         };
-
 
         Object.keys(clean).forEach((key) => {
           if (
@@ -732,8 +749,9 @@ utility.app.post("/upload-csv", upload2.single("file"), async (req, res) => {
               "unit"
             ].includes(key)
           ) {
-            if (clean[key] !== "") {
-              obj.monthly_data[key.replace(/-/g, " ")] = {
+            const month = formatToMonth(key);
+            if (month && clean[key] !== "") {
+              obj.monthly_data[month] = {
                 quantity: Number(clean[key]) || 0
               };
             }
@@ -762,551 +780,6 @@ utility.app.post("/upload-csv", upload2.single("file"), async (req, res) => {
     });
   }
 });
-
-
-
-
-
-// ____________________________________________________________________________________________________________
-
-
-
-// const { PDFDocument, StandardFonts, rgb } = require("pdf-lib");
-
-// utility.app.post("/generate_pdf", async (req, res) => {
-//   try {
-//     const body = req.body && Object.keys(req.body).length ? req.body : {};
-
-//     const payload = {
-//       reportingPeriod: body.reportingPeriod || "1 April 2023 to 31 March 2024",
-//       criteria: body.criteria || "IJM GHG Procedure/1.1 – ISO 14064-1:2018",
-//       otherSources: body.otherSources || "N/A",
-//       rows: body.rows || [
-//         { label: "Direct Emissions", value: "", type: "header", grayBg: true },
-//         { label: "Mobile Combustion", value: 8493.8 },
-//         { label: "Stationary Combustion", value: 12030.0 },
-//         { label: "Fugitive emission from refrigeration", value: 296.4 },
-//         { label: "Indirect emissions from purchased electricity", value: 51429.5 },
-//         { label: "Indirect emissions from transportation", value: "", type: "header", grayBg: true },
-//         { label: "Upstream transportation and distribution", value: 1237.5 },
-//         { label: "Business travel", value: 6073.1 },
-//         { label: "Employee commuting", value: 4817.2 },
-//         { label: "Indirect GHG emissions from products used by organization", value: "", type: "header", grayBg: true },
-//         { label: "Purchase goods and services", value: 918618.1 },
-//         { label: "Disposal of waste generated in operations", value: 6889.9 },
-//         { label: "Indirect GHG emissions associated with the use of products from the organization", value: "", type: "header", grayBg: true },
-//         { label: "Indirect GHG emissions from downstream leased assets", value: 17781.2 },
-//         { label: "Indirect GHG emissions from investments", value: 1838.4 },
-//         { label: "Indirect GHG emissions from use of sold products", value: 983.3 },
-//         { label: "Gross Emission", value: 1030488.4, bold: true },
-//         { label: "Intra-Group emission overlap", value: 90553.8, bold: true },
-//         { label: "Net Emission", value: 939934.6, bold: true }
-//       ]
-//     };
-
-//     const pdfDoc = await PDFDocument.create();
-//     const page = pdfDoc.addPage([842, 595]);
-//     const { width, height } = page.getSize();
-
-//     const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-//     const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-
-//     // ============================
-//     // WATERMARK - "bsi." in center
-//     // ============================
-//     const watermarkText = "bsi.";
-//     const watermarkSize = 180;
-//     const watermarkX = width / 2 - 100;
-//     const watermarkY = height / 2 - 50;
-
-//     page.drawText(watermarkText, {
-//       x: watermarkX,
-//       y: watermarkY,
-//       size: watermarkSize,
-//       font: fontBold,
-//       color: rgb(0.95, 0.95, 0.95),
-//       // opacity: 0.15,
-//       opacity: 0.10,
-//     });
-
-//     // ============================
-//     // HEADER "bsi."
-//     // ============================
-//     page.drawText("bsi", {
-//       x: 40,
-//       y: 545,
-//       size: 44,
-//       font: fontBold,
-//       color: rgb(0, 0, 0),
-//     });
-
-//     // Draw the red dot after "bsi"
-//     page.drawCircle({
-//       x: 125,
-//       y: 551,
-//       size: 4,
-//       color: rgb(0.9, 0.1, 0.1),
-//     });
-
-//     // ============================
-//     // TOP INFO TABLE (3 rows)
-//     // ============================
-//     const topTableX = 105;
-//     const topTableY = 500;
-//     const topTableWidth = width - 145;
-//     const topRowHeight = 26;
-
-//     const topTableData = [
-//       ["Indirect GHG emissions from\nother sources", payload.otherSources],
-//       ["Criteria for developing the organizational\nGHG Inventory:", payload.criteria],
-//       ["Reporting Period", payload.reportingPeriod],
-//     ];
-
-//     // Draw outer rectangle
-//     page.drawRectangle({
-//       x: topTableX,
-//       y: topTableY - topRowHeight * 3,
-//       width: topTableWidth,
-//       height: topRowHeight * 3,
-//       borderWidth: 1,
-//       borderColor: rgb(0, 0, 0),
-//     });
-
-//     // Draw horizontal lines
-//     for (let i = 1; i < topTableData.length; i++) {
-//       page.drawLine({
-//         start: { x: topTableX, y: topTableY - topRowHeight * i },
-//         end: { x: topTableX + topTableWidth, y: topTableY - topRowHeight * i },
-//         thickness: 1,
-//         color: rgb(0, 0, 0),
-//       });
-//     }
-
-//     // Draw vertical line separating columns
-//     const topColSplit = topTableX + topTableWidth * 0.45;
-//     page.drawLine({
-//       start: { x: topColSplit, y: topTableY },
-//       end: { x: topColSplit, y: topTableY - topRowHeight * 3 },
-//       thickness: 1,
-//       color: rgb(0, 0, 0),
-//     });
-
-//     // Draw content
-//     for (let i = 0; i < topTableData.length; i++) {
-//       const yPos = topTableY - topRowHeight * i - 17;
-
-//       // Left column text
-//       const leftLines = topTableData[i][0].split('\n');
-//       leftLines.forEach((line, idx) => {
-//         page.drawText(line, {
-//           x: topTableX + 8,
-//           y: yPos + (leftLines.length > 1 ? 6 - idx * 10 : 0),
-//           // size: 9,
-//           size: 12,
-//           font,
-//           color: rgb(0, 0, 0),
-//         });
-//       });
-
-//       // Right column text
-//       page.drawText(String(topTableData[i][1]), {
-//         x: topColSplit + 8,
-//         y: yPos,
-//         // size: 9,
-//         size: 12,
-//         font,
-//         color: rgb(0, 0, 0),
-//       });
-//     }
-
-//     // ============================
-//     // MAIN EMISSIONS TABLE
-//     // ============================
-//     const mainTableX = 105;
-//     const startTableY = 410; // Moved up for more space at bottom
-//     let mainTableY = startTableY;
-//     const mainTableWidth = topTableWidth;
-//     // const mainRowHeight = 21.5; // Increased for better spacing
-//     const mainRowHeight = 18.5; // Increased for better spacing
-//     const labelColWidth = mainTableWidth * 0.72;
-//     const valueColX = mainTableX + labelColWidth;
-
-//     // Draw outer border
-//     const tableStartY = mainTableY;
-//     const totalRows = payload.rows.length + 1; // +1 for header
-
-//     page.drawRectangle({
-//       x: mainTableX,
-//       y: mainTableY - mainRowHeight * totalRows,
-//       width: mainTableWidth,
-//       height: mainRowHeight * (totalRows),
-//       borderWidth: 1,
-//       borderColor: rgb(0, 0, 0),
-//     });
-
-//     // Draw vertical line separating columns
-//     page.drawLine({
-//       start: { x: valueColX, y: tableStartY },
-//       end: { x: valueColX, y: mainTableY - mainRowHeight * totalRows },
-//       thickness: 1,
-//       color: rgb(0, 0, 0),
-//     });
-
-//     // Draw header row
-//     page.drawLine({
-//       start: { x: mainTableX, y: mainTableY },
-//       end: { x: mainTableX + mainTableWidth, y: mainTableY },
-//       thickness: 1,
-//       color: rgb(0, 0, 0),
-//     });
-
-//     // page.drawText("tCO₂e", {
-//     page.drawText("tCO2e", {
-//       x: valueColX + 10,
-//       y: mainTableY - 15,
-//       // size: 10,
-//       size: 12,
-//       font: fontBold,
-//     });
-
-//     mainTableY -= mainRowHeight;
-
-//     // Draw all data rows
-//     for (let i = 0; i < payload.rows.length; i++) {
-//       const row = payload.rows[i];
-
-//       // Draw gray background for header rows (before borders)
-//       if (row.grayBg) {
-//         page.drawRectangle({
-//           x: mainTableX,
-//           y: mainTableY - mainRowHeight,
-//           width: mainTableWidth,
-//           height: mainRowHeight,
-//           color: rgb(0.9, 0.9, 0.9),
-//         });
-//       }
-
-//       // Draw horizontal line
-//       page.drawLine({
-//         start: { x: mainTableX, y: mainTableY },
-//         end: { x: mainTableX + mainTableWidth, y: mainTableY },
-//         thickness: 0.5,
-//         color: rgb(0, 0, 0),
-//       });
-
-//       // Only bold for rows where bold: true (Gross, Intra-Group, Net Emission)
-//       const useBold = row.bold === true;
-//       const useFont = useBold ? fontBold : font;
-
-//       // Draw label
-//       page.drawText(String(row.label), {
-//         x: mainTableX + 6,
-//         y: mainTableY - 14,
-//         size: 12, // Back to size 9
-//         // size: 9, // Back to size 9
-//         font: useFont,
-//       });
-
-//       // Draw value (only if not empty)
-//       if (row.value !== "" && row.value !== null && row.value !== undefined) {
-//         const formattedValue = Number(row.value).toLocaleString("en-US", {
-//           minimumFractionDigits: 1,
-//           maximumFractionDigits: 1,
-//         });
-
-//         page.drawText(formattedValue, {
-//           x: valueColX + 10,
-//           y: mainTableY - 14,
-//           size: 9, // Back to size 9
-//           font: useFont,
-//         });
-//       }
-
-//       mainTableY -= mainRowHeight;
-//     }
-
-//     const pdfBytes = await pdfDoc.save();
-
-//     // Generate filename with timestamp
-//     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-//     const filename = `GHG-Emissions-Report-${timestamp}.pdf`;
-
-//     res.setHeader("Content-Type", "application/pdf");
-//     res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
-//     res.setHeader("Content-Length", pdfBytes.length);
-
-//     res.send(Buffer.from(pdfBytes));
-//   } catch (err) {
-//     console.log(err);
-//     res.status(500).json({ error: "PDF generation failed", detail: err.message });
-//   }
-// });
-
-
-
-
-
-
-
-
-// const { PDFDocument, StandardFonts, rgb } = require("pdf-lib");
-
-// utility.app.post("/generate_pdf", async (req, res) => {
-//   try {
-//     const body = req.body && Object.keys(req.body).length ? req.body : {};
-
-//     // No defaults - use only what's sent in the request
-//     const payload = {
-//       reportingPeriod: body.reportingPeriod,
-//       criteria: body.criteria,
-//       otherSources: body.otherSources,
-//       rows: body.rows || []
-//     };
-
-//     const pdfDoc = await PDFDocument.create();
-//     const page = pdfDoc.addPage([842, 595]);
-//     const { width, height } = page.getSize();
-
-//     const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-//     const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-
-//     // ============================
-//     // WATERMARK - "bsi." in center
-//     // ============================
-//     const watermarkText = "bsi.";
-//     const watermarkSize = 180;
-//     const watermarkX = width / 2 - 100;
-//     const watermarkY = height / 2 - 50;
-
-//     page.drawText(watermarkText, {
-//       x: watermarkX,
-//       y: watermarkY,
-//       size: watermarkSize,
-//       font: fontBold,
-//       color: rgb(0.95, 0.95, 0.95),
-//       opacity: 0.10,
-//     });
-
-//     // ============================
-//     // HEADER "bsi."
-//     // ============================
-//     page.drawText("bsi", {
-//       x: 40,
-//       y: 545,
-//       size: 44,
-//       font: fontBold,
-//       color: rgb(0, 0, 0),
-//     });
-
-//     // Draw the red dot after "bsi"
-//     page.drawCircle({
-//       x: 125,
-//       y: 551,
-//       size: 4,
-//       color: rgb(0.9, 0.1, 0.1),
-//     });
-
-//     // ============================
-//     // TOP INFO TABLE (Dynamic rows based on what's provided)
-//     // ============================
-//     const topTableX = 105;
-//     const topTableY = 500;
-//     const topTableWidth = width - 145;
-//     const topRowHeight = 26;
-
-//     // Build table data only from provided fields
-//     const topTableData = [];
-
-//     if (payload.otherSources !== undefined && payload.otherSources !== null) {
-//       topTableData.push(["Indirect GHG emissions from\nother sources", payload.otherSources]);
-//     }
-
-//     if (payload.criteria !== undefined && payload.criteria !== null) {
-//       topTableData.push(["Criteria for developing the organizational\nGHG Inventory:", payload.criteria]);
-//     }
-
-//     if (payload.reportingPeriod !== undefined && payload.reportingPeriod !== null) {
-//       topTableData.push(["Reporting Period", payload.reportingPeriod]);
-//     }
-
-//     // Only draw top table if there's data
-//     if (topTableData.length > 0) {
-//       // Draw outer rectangle
-//       page.drawRectangle({
-//         x: topTableX,
-//         y: topTableY - topRowHeight * topTableData.length,
-//         width: topTableWidth,
-//         height: topRowHeight * topTableData.length,
-//         borderWidth: 1,
-//         borderColor: rgb(0, 0, 0),
-//       });
-
-//       // Draw horizontal lines
-//       for (let i = 1; i < topTableData.length; i++) {
-//         page.drawLine({
-//           start: { x: topTableX, y: topTableY - topRowHeight * i },
-//           end: { x: topTableX + topTableWidth, y: topTableY - topRowHeight * i },
-//           thickness: 1,
-//           color: rgb(0, 0, 0),
-//         });
-//       }
-
-//       // Draw vertical line separating columns
-//       const topColSplit = topTableX + topTableWidth * 0.45;
-//       page.drawLine({
-//         start: { x: topColSplit, y: topTableY },
-//         end: { x: topColSplit, y: topTableY - topRowHeight * topTableData.length },
-//         thickness: 1,
-//         color: rgb(0, 0, 0),
-//       });
-
-//       // Draw content
-//       for (let i = 0; i < topTableData.length; i++) {
-//         const yPos = topTableY - topRowHeight * i - 17;
-
-//         // Left column text
-//         const leftLines = topTableData[i][0].split('\n');
-//         leftLines.forEach((line, idx) => {
-//           page.drawText(line, {
-//             x: topTableX + 8,
-//             y: yPos + (leftLines.length > 1 ? 6 - idx * 10 : 0),
-//             size: 12,
-//             font,
-//             color: rgb(0, 0, 0),
-//           });
-//         });
-
-//         // Right column text
-//         page.drawText(String(topTableData[i][1]), {
-//           x: topColSplit + 8,
-//           y: yPos,
-//           size: 12,
-//           font,
-//           color: rgb(0, 0, 0),
-//         });
-//       }
-//     }
-
-//     // ============================
-//     // MAIN EMISSIONS TABLE (Only if rows exist)
-//     // ============================
-//     if (payload.rows.length > 0) {
-//       const mainTableX = 105;
-//       const startTableY = 410;
-//       let mainTableY = startTableY;
-//       const mainTableWidth = topTableWidth;
-//       const mainRowHeight = 18.5;
-//       const labelColWidth = mainTableWidth * 0.72;
-//       const valueColX = mainTableX + labelColWidth;
-
-//       // Draw outer border
-//       const tableStartY = mainTableY;
-//       const totalRows = payload.rows.length + 1; // +1 for header
-
-//       page.drawRectangle({
-//         x: mainTableX,
-//         y: mainTableY - mainRowHeight * totalRows,
-//         width: mainTableWidth,
-//         height: mainRowHeight * totalRows,
-//         borderWidth: 1,
-//         borderColor: rgb(0, 0, 0),
-//       });
-
-//       // Draw vertical line separating columns
-//       page.drawLine({
-//         start: { x: valueColX, y: tableStartY },
-//         end: { x: valueColX, y: mainTableY - mainRowHeight * totalRows },
-//         thickness: 1,
-//         color: rgb(0, 0, 0),
-//       });
-
-//       // Draw header row
-//       page.drawLine({
-//         start: { x: mainTableX, y: mainTableY },
-//         end: { x: mainTableX + mainTableWidth, y: mainTableY },
-//         thickness: 1,
-//         color: rgb(0, 0, 0),
-//       });
-
-//       page.drawText("tCO2e", {
-//         x: valueColX + 10,
-//         y: mainTableY - 15,
-//         size: 12,
-//         font: fontBold,
-//       });
-
-//       mainTableY -= mainRowHeight;
-
-//       // Draw all data rows
-//       for (let i = 0; i < payload.rows.length; i++) {
-//         const row = payload.rows[i];
-
-//         // Draw gray background for header rows (before borders)
-//         if (row.grayBg) {
-//           page.drawRectangle({
-//             x: mainTableX,
-//             y: mainTableY - mainRowHeight,
-//             width: mainTableWidth,
-//             height: mainRowHeight,
-//             color: rgb(0.9, 0.9, 0.9),
-//           });
-//         }
-
-//         // Draw horizontal line
-//         page.drawLine({
-//           start: { x: mainTableX, y: mainTableY },
-//           end: { x: mainTableX + mainTableWidth, y: mainTableY },
-//           thickness: 0.5,
-//           color: rgb(0, 0, 0),
-//         });
-
-//         // Only bold for rows where bold: true
-//         const useBold = row.bold === true;
-//         const useFont = useBold ? fontBold : font;
-
-//         // Draw label
-//         page.drawText(String(row.label), {
-//           x: mainTableX + 6,
-//           y: mainTableY - 14,
-//           size: 12,
-//           font: useFont,
-//         });
-
-//         // Draw value (only if not empty)
-//         if (row.value !== "" && row.value !== null && row.value !== undefined) {
-//           const formattedValue = Number(row.value).toLocaleString("en-US", {
-//             minimumFractionDigits: 1,
-//             maximumFractionDigits: 1,
-//           });
-
-//           page.drawText(formattedValue, {
-//             x: valueColX + 10,
-//             y: mainTableY - 14,
-//             size: 9,
-//             font: useFont,
-//           });
-//         }
-
-//         mainTableY -= mainRowHeight;
-//       }
-//     }
-
-//     const pdfBytes = await pdfDoc.save();
-
-//     // Generate filename with timestamp
-//     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-//     const filename = `GHG-Emissions-Report-${timestamp}.pdf`;
-
-//     res.setHeader("Content-Type", "application/pdf");
-//     res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
-//     res.setHeader("Content-Length", pdfBytes.length);
-
-//     res.send(Buffer.from(pdfBytes));
-//   } catch (err) {
-//     console.log(err);
-//     res.status(500).json({ error: "PDF generation failed", detail: err.message });
-//   }
-// });
 
 
 

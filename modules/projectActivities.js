@@ -708,8 +708,7 @@ class ProjectActivities {
 
   InitializeNewProject = async (req, res) => {
     try {
-      // const creator_user_id = req.user.userId; // From JWT token
-      const creator_user_id = 4; // From JWT token
+      const creator_user_id = req.user.userId;
       const {
         facility_id,
         project_name,
@@ -730,7 +729,9 @@ class ProjectActivities {
       // Convert date strings to Date objects if they're strings
       const startDate = new Date(reporting_period_start);
       const endDate = new Date(reporting_period_end);
-
+      // TODO: Start Date and End Date were not getting stored in DB
+      console.log("Start Date = ",startDate)
+      console.log("End Date = ",endDate)
       const query = {
         text: 'SELECT * FROM initialize_new_project_with_members($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)',
         values: [
@@ -751,9 +752,8 @@ class ProjectActivities {
           JSON.stringify(team_assignments)
         ]
       };
-
       const result = await this.utility.sql.query(query);
-
+      console.log("Result = ", result)
       if (!result.rows || result.rows.length === 0) {
         return this.utility.response.init(res, false, "Project creation failed", {
           error: "PROJECT_CREATION_FAILED"
@@ -1056,7 +1056,7 @@ WHERE
   get_project_portfolio_stats = async (req, res) => {
     try {
       const { p_user_id } = req.body;
-      
+
       const query = {
         text: 'SELECT * FROM get_project_portfolio_stats($1)',
         values: [p_user_id]
