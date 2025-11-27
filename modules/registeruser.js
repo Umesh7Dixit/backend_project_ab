@@ -89,12 +89,14 @@ UserLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
     console.log("password",password)
-    const decryptedPassword = passwordUtils.decrypt(password);
-    console.log("decryptedPassword",decryptedPassword)
+    // const decryptedPassword = passwordUtils.decrypt(password);
+    // console.log("decryptedPassword",decryptedPassword)
+
     // Your existing database authentication
     const query = {
       text: 'SELECT * FROM public.authenticate_user($1, $2)',
-      values: [email, decryptedPassword]
+      // values: [email, decryptedPassword]
+      values: [email, password]
     };
 
     const result = await this.utility.sql.query(query);
