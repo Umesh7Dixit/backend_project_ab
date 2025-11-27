@@ -729,7 +729,6 @@ class ProjectActivities {
       // Convert date strings to Date objects if they're strings
       const startDate = new Date(reporting_period_start);
       const endDate = new Date(reporting_period_end);
-      // TODO: Start Date and End Date were not getting stored in DB
       console.log("Start Date = ",startDate)
       console.log("End Date = ",endDate)
       const query = {

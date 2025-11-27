@@ -733,8 +733,7 @@ utility.app.post("/upload-csv", upload2.single("file"), async (req, res) => {
           selection_2: clean.selection_2 || "",
           unit: clean.unit || "",
           monthly_data: {},
-          // TODO: Why this 124?
-          subcategory_id: 124
+          subcategory_id: Number(clean.subcategory_id) || 0
         };
 
         Object.keys(clean).forEach((key) => {
