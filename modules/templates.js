@@ -624,14 +624,6 @@ class Templates {
     }
   };
 
-
-
-
-
-
-
-
-
   save_project_activity_configuration = async (req, res) => {
     try {
 
@@ -675,23 +667,9 @@ class Templates {
     }
   };
 
-
-
-
-
-
-
-
-
-
-
-
-
   copy_template_to_staging_area = async (req, res) => {
     try {
-
       const { p_project_id, p_template_id } = req.body
-
       const query = {
         text: 'SELECT * FROM  copy_template_to_staging_area($1,$2)',
         values: [p_project_id, p_template_id]
@@ -734,11 +712,11 @@ class Templates {
   get_staged_activities_for_project = async (req, res) => {
     try {
 
-      const { p_project_id } = req.body
+      const { p_project_id, p_scope } = req.body
 
       const query = {
-        text: 'SELECT * FROM  get_staged_activities_for_project($1)',
-        values: [p_project_id]
+        text: 'SELECT * FROM  get_staged_activities_for_project($1,$2)',
+        values: [p_project_id, p_scope]
       };
 
       const result = await this.utility.sql.query(query);
