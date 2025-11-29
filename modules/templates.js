@@ -2484,6 +2484,56 @@ class Templates {
 
 
 
+
+
+  
+
+  get_user_project_requests = async (req, res) => {
+    try {
+
+      const {  p_user_id , p_status_filter  } = req.body
+
+      const query = {
+        text: 'Select * from get_user_project_requests($1,$2)',
+        values: [ p_user_id, p_status_filter]
+      };
+
+      const result = await this.utility.sql.query(query);
+
+      if (!result.rows) {
+        return this.utility.response.init(res, false, "No response from database", {
+          error: "DATABASE_ERROR"
+        }, 500);
+      }
+
+      return this.utility.response.init(
+        res,
+        true,
+        "get_user_project_requests successfully",
+        {
+          templates: result.rows,
+          count: result.rows.length
+        }
+      );
+
+    } catch (error) {
+      console.error('Error fetching templates:', error);
+      return this.utility.response.init(
+        res,
+        false,
+        "Internal server error while fetching templates",
+        {
+          error: "INTERNAL_SERVER_ERROR",
+          details: error.message
+        },
+        500
+      );
+    }
+  };
+
+
+
+
 }
 
 module.exports = Templates;

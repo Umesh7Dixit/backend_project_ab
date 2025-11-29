@@ -637,6 +637,10 @@ utility.app.post('/add_task_comment',
   templates.add_task_comment
 );
 
+utility.app.post('/get_user_project_requests',
+  templates.get_user_project_requests
+);
+
 
 // utility.app.post('/userlogout' ,                                    utility.authenticateToken,  register.userlogout);
 
