@@ -2452,7 +2452,7 @@ class Templates {
       const { p_task_id } = req.body
 
       const query = {
-        text: 'SELECT  * FROM get_assigned_tasks_for_user($1);',
+        text: 'SELECT * FROM get_task_conversation($1);',
         values: [p_task_id]
       };
 
@@ -2467,7 +2467,7 @@ class Templates {
       return this.utility.response.init(
         res,
         true,
-        "get_project_portfolio_list successfully",
+        "get_task_conversation successfully",
         {
           templates: result.rows,
           count: result.rows.length
@@ -2517,7 +2517,7 @@ class Templates {
       return this.utility.response.init(
         res,
         true,
-        "get_project_portfolio_list successfully",
+        "comment added  successfully",
         {
           templates: result.rows,
           count: result.rows.length
