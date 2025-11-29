@@ -641,6 +641,14 @@ utility.app.post('/get_user_project_requests',
   templates.get_user_project_requests
 );
 
+utility.app.post('/get_all_facilities_for_parent_org_of_user',
+  templates.get_all_facilities_for_parent_org_of_user
+);
+
+utility.app.post('/record_approver_decision',
+  templates.record_approver_decision
+);
+
 
 // utility.app.post('/userlogout' ,                                    utility.authenticateToken,  register.userlogout);
 

@@ -2534,6 +2534,102 @@ class Templates {
 
 
 
+
+  
+
+  get_all_facilities_for_parent_org_of_user = async (req, res) => {
+    try {
+
+      const {  p_user_id   } = req.body
+
+      const query = {
+        text: 'Select * from get_all_facilities_for_parent_org_of_user($1)',
+        values: [ p_user_id ]
+      };
+
+      const result = await this.utility.sql.query(query);
+
+      if (!result.rows) {
+        return this.utility.response.init(res, false, "No response from database", {
+          error: "DATABASE_ERROR"
+        }, 500);
+      }
+
+      return this.utility.response.init(
+        res,
+        true,
+        "get_all_facilities_for_parent_org_of_user successfully",
+        {
+          templates: result.rows,
+          count: result.rows.length
+        }
+      );
+
+    } catch (error) {
+      console.error('Error fetching templates:', error);
+      return this.utility.response.init(
+        res,
+        false,
+        "Internal server error while fetching templates",
+        {
+          error: "INTERNAL_SERVER_ERROR",
+          details: error.message
+        },
+        500
+      );
+    }
+  };
+
+
+
+  
+
+  record_approver_decision = async (req, res) => {
+    try {
+
+      const {  p_project_id,p_approver_id_user_id , p_decision, p_remarks  } = req.body
+
+      const query = {
+        text: 'Select * from record_approver_decision($1,$2,$3,$4)',
+        values: [ p_project_id,p_approver_id_user_id , p_decision, p_remarks ]
+      };
+
+      const result = await this.utility.sql.query(query);
+
+      if (!result.rows) {
+        return this.utility.response.init(res, false, "No response from database", {
+          error: "DATABASE_ERROR"
+        }, 500);
+      }
+
+      return this.utility.response.init(
+        res,
+        true,
+        "record_approver_decision successfully",
+        {
+          templates: result.rows,
+          count: result.rows.length
+        }
+      );
+
+    } catch (error) {
+      console.error('Error fetching templates:', error);
+      return this.utility.response.init(
+        res,
+        false,
+        "Internal server error while fetching templates",
+        {
+          error: "INTERNAL_SERVER_ERROR",
+          details: error.message
+        },
+        500
+      );
+    }
+  };
+
+
+
+
 }
 
 module.exports = Templates;
