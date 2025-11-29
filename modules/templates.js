@@ -2548,51 +2548,104 @@ class Templates {
 
   
 
-  get_user_project_requests = async (req, res) => {
-    try {
+  // get_user_project_requests = async (req, res) => {
+  //   try {
 
-      const {  p_user_id , p_status_filter  } = req.body
+  //     const {  p_user_id , p_status_filter  } = req.body
 
-      const query = {
-        text: 'Select * from get_user_project_requests($1,$2)',
-        values: [ p_user_id, p_status_filter]
-      };
+  //     const query = {
+  //       text: 'Select * from get_user_project_requests($1,$2)',
+  //       values: [ p_user_id, p_status_filter]
+  //     };
 
-      const result = await this.utility.sql.query(query);
+  //     const result = await this.utility.sql.query(query);
 
-      if (!result.rows) {
-        return this.utility.response.init(res, false, "No response from database", {
-          error: "DATABASE_ERROR"
-        }, 500);
-      }
+  //     if (!result.rows) {
+  //       return this.utility.response.init(res, false, "No response from database", {
+  //         error: "DATABASE_ERROR"
+  //       }, 500);
+  //     }
 
-      return this.utility.response.init(
-        res,
-        true,
-        "get_user_project_requests successfully",
-        {
-          templates: result.rows,
-          count: result.rows.length
-        }
-      );
+  //     return this.utility.response.init(
+  //       res,
+  //       true,
+  //       "get_user_project_requests successfully",
+  //       {
+  //         templates: result.rows,
+  //         count: result.rows.length
+  //       }
+  //     );
 
-    } catch (error) {
-      console.error('Error fetching templates:', error);
-      return this.utility.response.init(
-        res,
-        false,
-        "Internal server error while fetching templates",
-        {
-          error: "INTERNAL_SERVER_ERROR",
-          details: error.message
-        },
-        500
-      );
+  //   } catch (error) {
+  //     console.error('Error fetching templates:', error);
+  //     return this.utility.response.init(
+  //       res,
+  //       false,
+  //       "Internal server error while fetching templates",
+  //       {
+  //         error: "INTERNAL_SERVER_ERROR",
+  //         details: error.message
+  //       },
+  //       500
+  //     );
+  //   }
+  // };
+
+
+
+get_user_project_requests = async (req, res) => {
+  try {
+    const { p_user_id, p_status_filter } = req.body;
+
+    const query = {
+      text: 'SELECT * FROM get_user_project_requests($1,$2)',
+      values: [p_user_id, p_status_filter]
+    };
+
+    const result = await this.utility.sql.query(query);
+
+    if (!result.rows || result.rows.length === 0) {
+      return this.utility.response.init(res, true, "No records found", {
+        summary: {},
+        requests: []
+      });
     }
-  };
 
+    const summaryFields = [
+      'total_related_requests',
+      'total_team_requests',
+      'total_user_requests',
+      'total_open_requests',
+      'total_closed_requests'
+    ];
 
+    // Extract summary from first row
+    const summary = {};
+    summaryFields.forEach(key => {
+      summary[key] = result.rows[0][key];
+    });
 
+    // Generate cleaned request list
+    const requests = result.rows.map(row => {
+      const cleaned = { ...row };
+      summaryFields.forEach(key => delete cleaned[key]);
+      return cleaned;
+    });
+
+    return this.utility.response.init(res, true, "Fetched successfully", {
+      summary,
+      requests,
+      count: requests.length
+    });
+
+  } catch (error) {
+    console.error("Error fetching project requests:", error);
+    return this.utility.response.init(res, false, "Internal server error", {
+      error: "INTERNAL_SERVER_ERROR",
+      details: error.message
+    }, 500);
+  }
+};
 
 
   
