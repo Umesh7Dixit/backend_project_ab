@@ -1865,50 +1865,110 @@ class Templates {
 
 
 
-
-
   remove_project_auditor = async (req, res) => {
-    try {
+  try {
+    const { p_project_id, p_auditor_id, p_requester_id } = req.body;
 
-      const { p_project_id, p_auditor_id, p_requester_id } = req.body
+    const query = {
+      text: 'SELECT * FROM remove_project_auditor($1,$2,$3)',
+      values: [p_project_id, p_auditor_id, p_requester_id]
+    };
 
-      const query = {
-        text: 'SELECT * FROM remove_project_auditor($1,$2,$3)',
-        values: [p_project_id, p_auditor_id, p_requester_id]
-      };
+    const result = await this.utility.sql.query(query);
 
-      const result = await this.utility.sql.query(query);
+    if (!result.rows || result.rows.length === 0) {
+      return this.utility.response.init(res, false, "No response from database", {
+        error: "DATABASE_ERROR"
+      }, 500);
+    }
 
-      if (!result.rows) {
-        return this.utility.response.init(res, false, "No response from database", {
-          error: "DATABASE_ERROR"
-        }, 500);
-      }
+    const row = result.rows[0];
 
-      return this.utility.response.init(
-        res,
-        true,
-        "remove_project_auditor successfully",
-        {
-          templates: result.rows,
-          count: result.rows.length
-        }
-      );
-
-    } catch (error) {
-      console.error('Error fetching templates:', error);
+    // ❌ DB returned error → mark unsuccessful
+    if (row.remove_project_auditor && row.remove_project_auditor.includes("Error")) {
       return this.utility.response.init(
         res,
         false,
-        "Internal server error while fetching templates",
+        row.remove_project_auditor,
         {
-          error: "INTERNAL_SERVER_ERROR",
-          details: error.message
+          templates: result.rows
         },
-        500
+        400 // or something appropriate
       );
     }
-  };
+
+    // ✅ Success → mark successful
+    return this.utility.response.init(
+      res,
+      true,
+      "remove_project_auditor successfully",
+      {
+        templates: result.rows,
+        count: result.rows.length
+      }
+    );
+
+  } catch (error) {
+    console.error('Error fetching templates:', error);
+    return this.utility.response.init(
+      res,
+      false,
+      "Internal server error while fetching templates",
+      {
+        error: "INTERNAL_SERVER_ERROR",
+        details: error.message
+      },
+      500
+    );
+  }
+};
+
+
+
+
+
+  // remove_project_auditor = async (req, res) => {
+  //   try {
+
+  //     const { p_project_id, p_auditor_id, p_requester_id } = req.body
+
+  //     const query = {
+  //       text: 'SELECT * FROM remove_project_auditor($1,$2,$3)',
+  //       values: [p_project_id, p_auditor_id, p_requester_id]
+  //     };
+
+  //     const result = await this.utility.sql.query(query);
+
+  //     if (!result.rows) {
+  //       return this.utility.response.init(res, false, "No response from database", {
+  //         error: "DATABASE_ERROR"
+  //       }, 500);
+  //     }
+
+  //     return this.utility.response.init(
+  //       res,
+  //       true,
+  //       "remove_project_auditor successfully",
+  //       {
+  //         templates: result.rows,
+  //         count: result.rows.length
+  //       }
+  //     );
+
+  //   } catch (error) {
+  //     console.error('Error fetching templates:', error);
+  //     return this.utility.response.init(
+  //       res,
+  //       false,
+  //       "Internal server error while fetching templates",
+  //       {
+  //         error: "INTERNAL_SERVER_ERROR",
+  //         details: error.message
+  //       },
+  //       500
+  //     );
+  //   }
+  // };
 
 
 
