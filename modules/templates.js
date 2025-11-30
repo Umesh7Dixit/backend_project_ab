@@ -686,7 +686,7 @@ class Templates {
       return this.utility.response.init(
         res,
         true,
-        "template copy successfully",
+        "template copyvto stage area successfully",
         {
           templates: result.rows,
           count: result.rows.length
@@ -730,7 +730,7 @@ class Templates {
       return this.utility.response.init(
         res,
         true,
-        "template copy successfully",
+        "Getting Staged Template Data successfully",
         {
           templates: result.rows,
           count: result.rows.length
@@ -759,7 +759,7 @@ class Templates {
       const { p_project_id, p_subcategory_id, p_frequency } = req.query;
 
       const query = {
-        text: 'SELECT append_staged_activity_by_id($1,$2,$3) as template_data',
+        text: 'SELECT * FROM append_staged_activity_by_id($1,$2,$3)',
         values: [p_project_id, p_subcategory_id, p_frequency]
       };
 
@@ -782,7 +782,7 @@ class Templates {
       return this.utility.response.init(
         res,
         true,
-        "append_staged_activity_by_id successfully",
+        "Data Added on Staged Template Area successfully",
         {
           template: templateData
         }
@@ -812,7 +812,7 @@ class Templates {
       const { p_project_id } = req.body
 
       const query = {
-        text: 'SELECT * FROM   commit_staged_changes_to_project($1)',
+        text: 'SELECT * FROM commit_staged_changes_to_project($1)',
         values: [p_project_id]
       };
 
@@ -827,7 +827,7 @@ class Templates {
       return this.utility.response.init(
         res,
         true,
-        " commit_staged_changes_to_project successfully",
+        "commited staged changes to project successfully",
         {
           templates: result.rows,
           count: result.rows.length
