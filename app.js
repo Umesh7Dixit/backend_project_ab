@@ -650,6 +650,11 @@ utility.app.post('/record_approver_decision',
 );
 
 
+utility.app.get('/getUnits',
+  templates.getUnits
+);
+
+
 // utility.app.post('/userlogout' ,                                    utility.authenticateToken,  register.userlogout);
 
 
