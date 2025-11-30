@@ -667,6 +667,9 @@ class Templates {
     }
   };
 
+
+  // _______________________________________________________________________________
+
   copy_template_to_staging_area = async (req, res) => {
     try {
       const { p_project_id, p_template_id } = req.body
@@ -686,7 +689,7 @@ class Templates {
       return this.utility.response.init(
         res,
         true,
-        "template copyvto stage area successfully",
+        "template data copied to stage area successfully",
         {
           templates: result.rows,
           count: result.rows.length
@@ -726,6 +729,19 @@ class Templates {
           error: "DATABASE_ERROR"
         }, 500);
       }
+          // Check if no records returned
+    if (result.rows.length === 0) {
+      return this.utility.response.init(
+        res,
+        false,
+        "No staged template data available",
+        {
+          templates: [],
+          count: 0
+        },
+        200
+      );
+    }
 
       return this.utility.response.init(
         res,
@@ -804,8 +820,6 @@ class Templates {
   };
 
 
-
-
   commit_staged_changes_to_project = async (req, res) => {
     try {
 
@@ -848,6 +862,8 @@ class Templates {
       );
     }
   };
+
+  // _______________________________________________________________________________
 
 
   run_all_validations_for_project = async (req, res) => {
