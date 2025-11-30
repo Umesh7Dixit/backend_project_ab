@@ -770,54 +770,120 @@ class Templates {
 
 
 
+  // append_staged_activity_by_id = async (req, res) => {
+  //   try {
+      
+  //     const { p_project_id, p_subcategory_id, p_frequency } = req.body;
+
+
+  //     const query = {
+  //       text: 'SELECT * FROM append_staged_activity_by_id($1,$2,$3)',
+  //       values: [p_project_id, p_subcategory_id, p_frequency]
+  //     };
+
+  //     const result = await this.utility.sql.query(query);
+
+  //     if (!result.rows || result.rows.length === 0) {
+  //       return this.utility.response.init(res, false, "append_staged_activity_by_id not found", {
+  //         error: "append_staged_activity_by_id_NOT_FOUND"
+  //       }, 404);
+  //     }
+
+  //     console.log("first->>",result);
+
+  //     const templateData = result.rows[0].template_data;
+
+  //     if (!templateData) {
+  //       return this.utility.response.init(res, false, "Template data is empty", {
+  //         error: "EMPTY_TEMPLATE"
+  //       }, 404);
+  //     }
+
+  //     return this.utility.response.init(
+  //       res,
+  //       true,
+  //       "Data Added on Staged Template Area successfully",
+  //       {
+  //         template: templateData
+  //       }
+  //     );
+
+  //   } catch (error) {
+  //     console.error('Error fetching template details:', error);
+  //     return this.utility.response.init(
+  //       res,
+  //       false,
+  //       "Internal server error while fetching template details",
+  //       {
+  //         error: "INTERNAL_SERVER_ERROR",
+  //         details: error.message
+  //       },
+  //       500
+  //     );
+  //   }
+  // };
+
+
+
   append_staged_activity_by_id = async (req, res) => {
-    try {
-      const { p_project_id, p_subcategory_id, p_frequency } = req.query;
+  try {
+    const { p_project_id, p_subcategory_id, p_frequency } = req.body;
 
-      const query = {
-        text: 'SELECT * FROM append_staged_activity_by_id($1,$2,$3)',
-        values: [p_project_id, p_subcategory_id, p_frequency]
-      };
+    const query = {
+      text: 'SELECT * FROM append_staged_activity_by_id($1,$2,$3)',
+      values: [p_project_id, p_subcategory_id, p_frequency]
+    };
 
-      const result = await this.utility.sql.query(query);
+    const result = await this.utility.sql.query(query);
 
-      if (!result.rows || result.rows.length === 0) {
-        return this.utility.response.init(res, false, "append_staged_activity_by_id not found", {
-          error: "append_staged_activity_by_id_NOT_FOUND"
-        }, 404);
-      }
-
-      const templateData = result.rows[0].template_data;
-
-      if (!templateData) {
-        return this.utility.response.init(res, false, "Template data is empty", {
-          error: "EMPTY_TEMPLATE"
-        }, 404);
-      }
-
-      return this.utility.response.init(
-        res,
-        true,
-        "Data Added on Staged Template Area successfully",
-        {
-          template: templateData
-        }
-      );
-
-    } catch (error) {
-      console.error('Error fetching template details:', error);
+    if (!result.rows || result.rows.length === 0) {
       return this.utility.response.init(
         res,
         false,
-        "Internal server error while fetching template details",
-        {
-          error: "INTERNAL_SERVER_ERROR",
-          details: error.message
-        },
+        "No response from database",
+        { error: "DB_EMPTY" },
         500
       );
     }
-  };
+
+    const dbResponse = result.rows[0].append_staged_activity_by_id;
+    const msg = dbResponse?.toString() || "Unknown DB response";
+
+    // Identify if DB returned "Error:"
+    if (msg.toLowerCase().startsWith("error")) {
+      return this.utility.response.init(
+        res,
+        false,
+        msg,
+        { rawMessage: msg },
+        400
+      );
+    }
+
+    // Otherwise treat as success
+    return this.utility.response.init(
+      res,
+      true,
+      msg,
+      {}
+    );
+
+  } catch (error) {
+    console.error('Error fetching template details:', error);
+    return this.utility.response.init(
+      res,
+      false,
+      "Internal server error while processing request",
+      {
+        error: "INTERNAL_SERVER_ERROR",
+        details: error.message
+      },
+      500
+    );
+  }
+};
+
+ 
 
 
   commit_staged_changes_to_project = async (req, res) => {
