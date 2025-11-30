@@ -2960,6 +2960,108 @@ get_user_project_requests = async (req, res) => {
 
 
 
+
+
+
+
+
+
+
+
+
+
+  
+
+  CreateProject = async (req, res) => {
+    try {
+      const {
+        facility_id,
+        project_name,
+        project_description,
+        reporting_period_start,
+        reporting_period_end,
+        responsible_party,
+        intended_user,
+        intended_use_of_inventory,
+        organisational_boundary_type,
+        reporting_protocol,
+        base_year,
+        team_member_ids
+      } = req.body;
+
+      // const creator_user_id = req.user.userId; // From JWT token
+      const creator_user_id = 15; // From JWT token
+
+      // Call the PostgreSQL function
+      const query = {
+        text: 'SELECT * FROM create_project($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14,$15,$16,$17,$18,$19,$20,$21)',
+        values: [
+          creator_user_id,
+          facility_id,
+          project_name,
+          project_description,
+          reporting_period_start,
+          reporting_period_end,
+          responsible_party,
+          intended_user,
+          intended_use_of_inventory,
+          organisational_boundary_type,
+          reporting_protocol,
+          base_year,
+          team_member_ids || null,
+
+
+
+          req.body.recalculation,       // $14
+          req.body.changes,             // $15
+          req.body.methodologies,       // $16
+          req.body.references,          // $17
+          req.body.sources,             // $18
+          req.body.risks,               // $19
+          req.body.assurance,           // $20
+          req.body.inventory            // $21
+        ]
+      };
+
+      const result = await this.utility.sql.query(query);
+
+      if (!result.rows || result.rows.length === 0) {
+        return this.utility.response.init(res, false, "No response from database", {
+          error: "DATABASE_ERROR"
+        }, 500);
+      }
+
+      const { new_project_id, status_message } = result.rows[0];
+
+      if (new_project_id) {
+        return this.utility.response.init(res, true, status_message, {
+          project_id: new_project_id,
+          project_name,
+          facility_id,
+          creator_user_id,
+          team_members_added: team_member_ids ? team_member_ids.length : 0,
+          reporting_period: {
+            start: reporting_period_start,
+            end: reporting_period_end
+          }
+        }, 201);
+      } else {
+        // Handle database errors (overlapping projects, etc.)
+        return this.utility.response.init(res, false, status_message, {
+          error: "PROJECT_CREATION_FAILED"
+        }, 400);
+      }
+
+    } catch (error) {
+      console.error('Error creating project:', error);
+      return this.utility.response.init(res, false, "Internal server error while creating project", {
+        error: "INTERNAL_SERVER_ERROR",
+        details: error.message
+      }, 500);
+    }
+  };
+
+
 }
 
 module.exports = Templates;

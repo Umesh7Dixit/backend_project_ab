@@ -197,6 +197,7 @@ createNewFacility = async (req, res) => {
 
     let p_id_document_url = null;
     let p_tax_document_url = null;
+    let p_logo_image_url   = null;
 
     // ✅ Upload p_id_document if exists
     if (req.files?.p_id_document?.length > 0) {
@@ -214,11 +215,23 @@ createNewFacility = async (req, res) => {
       p_tax_document_url = uploadRes.secure_url;
     }
 
+
+    // ✅ Upload p_logo_url if exists
+    if (req.files?.p_logo_url?.length > 0) {
+      const uploadRes = await cloudinary.uploader.upload(
+        req.files.p_logo_url[0].path
+      );
+      p_logo_image_url = uploadRes.secure_url;
+    }
+
+
+    
+
     const query = {
       text: `SELECT * FROM public.create_new_facility( 
               $1, $2, $3, $4, $5,
               $6, $7, $8, $9, $10,
-              $11, $12, $13
+              $11, $12, $13, $14
             )`,
       values: [
         p_org_id,
@@ -233,7 +246,8 @@ createNewFacility = async (req, res) => {
         p_country,
         p_postal_code,
         p_id_document_url,   //  Cloudinary URL
-        p_tax_document_url   //  Cloudinary URL
+        p_tax_document_url,   //  Cloudinary URL
+        p_logo_image_url
       ]
     };
 

@@ -152,6 +152,10 @@ class ProjectActivities {
     }
   };
 
+
+
+
+
   CreateProject = async (req, res) => {
     try {
       const {
@@ -169,11 +173,12 @@ class ProjectActivities {
         team_member_ids
       } = req.body;
 
-      const creator_user_id = req.user.userId; // From JWT token
+      // const creator_user_id = req.user.userId; // From JWT token
+      const creator_user_id = 15; // From JWT token
 
       // Call the PostgreSQL function
       const query = {
-        text: 'SELECT * FROM create_project($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)',
+        text: 'SELECT * FROM create_project($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14,$15,$16,$17,$18,$19,$20,$21)',
         values: [
           creator_user_id,
           facility_id,
@@ -187,7 +192,18 @@ class ProjectActivities {
           organisational_boundary_type,
           reporting_protocol,
           base_year,
-          team_member_ids || null
+          team_member_ids || null,
+
+
+
+          req.body.recalculation,       // $14
+          req.body.changes,             // $15
+          req.body.methodologies,       // $16
+          req.body.references,          // $17
+          req.body.sources,             // $18
+          req.body.risks,               // $19
+          req.body.assurance,           // $20
+          req.body.inventory            // $21
         ]
       };
 
@@ -228,6 +244,10 @@ class ProjectActivities {
       }, 500);
     }
   };
+
+
+
+
 
   CustomizeActiveScopes = async (req, res) => {
     try {

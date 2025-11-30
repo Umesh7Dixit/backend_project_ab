@@ -135,11 +135,13 @@ utility.app.post('/project/create-tasks',
   projectActivities.CreateProjectRequest
 );
 
-utility.app.post('/project/create',
-  utility.authenticateToken,
-  validation.validate(validationSchemas.createProject),
-  projectActivities.CreateProject
-);
+
+// previous createProject
+// utility.app.post('/project/create',
+//   utility.authenticateToken,
+//   validation.validate(validationSchemas.createProject),
+//   projectActivities.CreateProject
+// );
 
 utility.app.put('/project/customize-scopes',
   utility.authenticateToken,
@@ -473,7 +475,8 @@ utility.app.post('/createNewFacility',
   // validation.validate(validationSchemas.saveProjectActivityConfiguration),
   upload.fields([
     { name: "p_id_document", maxCount: 1 },
-    { name: "p_tax_document", maxCount: 1 }
+    { name: "p_tax_document", maxCount: 1 },
+    { name: "p_logo_url", maxCount: 1 }
   ]),
   facilities.createNewFacility
 );
@@ -660,6 +663,11 @@ utility.app.post('/delete_staged_activity',
 
 utility.app.post('/update_staged_activity',
   templates.update_staged_activity
+);
+
+
+utility.app.post('/project/create',
+  templates.CreateProject
 );
 
 
