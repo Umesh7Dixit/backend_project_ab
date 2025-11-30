@@ -2823,6 +2823,99 @@ get_user_project_requests = async (req, res) => {
   };
 
   
+  
+
+  delete_staged_activity = async (req, res) => {
+    try {
+
+      const {  p_project_id , p_subcategory_id  } = req.body
+
+      const query = {
+        text: 'Select * from delete_staged_activity($1,$2)',
+        values: [ p_project_id, p_subcategory_id ]
+      };
+
+      const result = await this.utility.sql.query(query);
+
+      if (!result.rows) {
+        return this.utility.response.init(res, false, "No response from database", {
+          error: "DATABASE_ERROR"
+        }, 500);
+      }
+
+      return this.utility.response.init(
+        res,
+        true,
+        "delete_staged_activity successfully",
+        {
+          templates: result.rows,
+          count: result.rows.length
+        }
+      );
+
+    } catch (error) {
+      console.error('Error fetching templates:', error);
+      return this.utility.response.init(
+        res,
+        false,
+        "Internal server error while fetching templates",
+        {
+          error: "INTERNAL_SERVER_ERROR",
+          details: error.message
+        },
+        500
+      );
+    }
+  };
+
+  
+  
+  
+
+  update_staged_activity = async (req, res) => {
+    try {
+
+      const {  p_project_id , p_old_subcategory_id, p_new_subcategory_id, p_new_frequency  } = req.body
+
+      const query = {
+        text: 'Select * from update_staged_activity($1,$2,$3,$4)',
+        values: [ p_project_id , p_old_subcategory_id, p_new_subcategory_id, p_new_frequency ]
+      };
+
+      const result = await this.utility.sql.query(query);
+
+      if (!result.rows) {
+        return this.utility.response.init(res, false, "No response from database", {
+          error: "DATABASE_ERROR"
+        }, 500);
+      }
+
+      return this.utility.response.init(
+        res,
+        true,
+        "update_staged_activity successfully",
+        {
+          templates: result.rows,
+          count: result.rows.length
+        }
+      );
+
+    } catch (error) {
+      console.error('Error fetching templates:', error);
+      return this.utility.response.init(
+        res,
+        false,
+        "Internal server error while fetching templates",
+        {
+          error: "INTERNAL_SERVER_ERROR",
+          details: error.message
+        },
+        500
+      );
+    }
+  };
+
+  
 
   getUnits = async (req, res) => {
     try {

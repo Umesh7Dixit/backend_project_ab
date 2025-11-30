@@ -654,6 +654,14 @@ utility.app.get('/getUnits',
   templates.getUnits
 );
 
+utility.app.post('/delete_staged_activity',
+  templates.delete_staged_activity
+);
+
+utility.app.post('/update_staged_activity',
+  templates.update_staged_activity
+);
+
 
 // utility.app.post('/userlogout' ,                                    utility.authenticateToken,  register.userlogout);
 
