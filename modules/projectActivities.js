@@ -726,101 +726,239 @@ class ProjectActivities {
   };
 
 
+  // InitializeNewProject = async (req, res) => {
+  //   try {
+  //     const creator_user_id = req.user.userId;
+  //     const {
+  //       facility_id,
+  //       project_name,
+  //       project_description = '',
+  //       reporting_period_start,
+  //       reporting_period_end,
+  //       responsible_party,
+  //       intended_user,
+  //       intended_use_of_inventory = '',
+  //       organisational_boundary_type,
+  //       reporting_protocol,
+  //       base_year,
+  //       industry,
+  //       // team_member_ids = []
+  //       team_assignments
+  //     } = req.body;
+
+  //     // Convert date strings to Date objects if they're strings
+  //     const startDate = new Date(reporting_period_start);
+  //     const endDate = new Date(reporting_period_end);
+  //     console.log("Start Date = ",startDate)
+  //     console.log("End Date = ",endDate)
+  //     const query = {
+  //       text: 'SELECT * FROM initialize_new_project_with_members($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)',
+  //       values: [
+  //         creator_user_id,
+  //         facility_id,
+  //         project_name,
+  //         project_description,
+  //         startDate,
+  //         endDate,
+  //         responsible_party,
+  //         intended_user,
+  //         intended_use_of_inventory,
+  //         organisational_boundary_type,
+  //         reporting_protocol,
+  //         base_year,
+  //         industry,
+  //         // team_member_ids
+  //         JSON.stringify(team_assignments)
+  //       ]
+  //     };
+  //     const result = await this.utility.sql.query(query);
+  //     console.log("Result = ", result)
+  //     if (!result.rows || result.rows.length === 0) {
+  //       return this.utility.response.init(res, false, "Project creation failed", {
+  //         error: "PROJECT_CREATION_FAILED"
+  //       }, 400);
+  //     }
+
+  //     const { new_project_id, status_message } = result.rows[0];
+
+  //     if (!new_project_id) {
+  //       return this.utility.response.init(res, false, status_message || "Project creation failed", {
+  //         error: "PROJECT_CREATION_FAILED"
+  //       }, 400);
+  //     }
+
+  //     return this.utility.response.init(
+  //       res,
+  //       true,
+  //       status_message || "Project created successfully",
+  //       {
+  //         project_id: new_project_id,
+  //         project_name,
+  //         facility_id,
+  //         creator_user_id,
+  //         industry,
+  //         // team_members_added: team_member_ids.length,
+  //         team_members_added: team_assignments.length,
+  //         reporting_period: {
+  //           start: reporting_period_start,
+  //           end: reporting_period_end
+  //         }
+  //       },
+  //       201
+  //     );
+
+  //   } catch (error) {
+  //     console.error('Error creating project:', error);
+  //     return this.utility.response.init(
+  //       res,
+  //       false,
+  //       error.message.includes('overlapping') ? error.message : "Internal server error while creating project",
+  //       {
+  //         error: error.message.includes('overlapping') ? "OVERLAPPING_PROJECT" : "INTERNAL_SERVER_ERROR",
+  //         details: error.message
+  //       },
+  //       error.message.includes('overlapping') ? 400 : 500
+  //     );
+  //   }
+  // };
+
+
+
+
   InitializeNewProject = async (req, res) => {
-    try {
-      const creator_user_id = req.user.userId;
-      const {
-        facility_id,
-        project_name,
-        project_description = '',
-        reporting_period_start,
-        reporting_period_end,
-        responsible_party,
-        intended_user,
-        intended_use_of_inventory = '',
-        organisational_boundary_type,
-        reporting_protocol,
-        base_year,
-        industry,
-        // team_member_ids = []
-        team_assignments
-      } = req.body;
+  try {
+    const creator_user_id = req.user.userId;
+    const {
+      // Original fields
+      facility_id,
+      project_name,
+      project_description = '',
+      reporting_period_start,
+      reporting_period_end,
+      responsible_party,
+      intended_user,
+      intended_use_of_inventory = '',
+      organisational_boundary_type,
+      reporting_protocol,
+      base_year,
+      team_assignments = [],
+      
+      // New fields for base year emissions and organizational boundaries
+      base_year_emissions = [],
+      org_boundaries = [],
+      
+      // New emissions reporting fields
+      base_year_recalculation_policy = null,
+      context_for_significant_changes = null,
+      non_ghg_methodologies = null,
+      methodologies_references = null,
+      excluded_facilities = null,
+      contractual_provisions = null,
+      external_assurance = null,
+      inventory_uncertainty = null,
+      ghg_sequestration = null,
+      organisational_diagram = null
+    } = req.body;
 
-      // Convert date strings to Date objects if they're strings
-      const startDate = new Date(reporting_period_start);
-      const endDate = new Date(reporting_period_end);
-      console.log("Start Date = ",startDate)
-      console.log("End Date = ",endDate)
-      const query = {
-        text: 'SELECT * FROM initialize_new_project_with_members($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)',
-        values: [
-          creator_user_id,
-          facility_id,
-          project_name,
-          project_description,
-          startDate,
-          endDate,
-          responsible_party,
-          intended_user,
-          intended_use_of_inventory,
-          organisational_boundary_type,
-          reporting_protocol,
-          base_year,
-          industry,
-          // team_member_ids
-          JSON.stringify(team_assignments)
-        ]
-      };
-      const result = await this.utility.sql.query(query);
-      console.log("Result = ", result)
-      if (!result.rows || result.rows.length === 0) {
-        return this.utility.response.init(res, false, "Project creation failed", {
-          error: "PROJECT_CREATION_FAILED"
-        }, 400);
-      }
+    // Convert date strings to Date objects if they're strings
+    const startDate = new Date(reporting_period_start);
+    const endDate = new Date(reporting_period_end);
+    
+    console.log("Start Date = ", startDate);
+    console.log("End Date = ", endDate);
 
-      const { new_project_id, status_message } = result.rows[0];
+    // Prepare the SQL query with all parameters
+    const query = {
+      text: `SELECT * FROM initialize_new_project_with_members(
+        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15,
+        $16, $17, $18, $19, $20, $21, $22, $23, $24, $25
+      )`,
+      values: [
+        creator_user_id,                          // $1
+        facility_id,                              // $2
+        project_name,                             // $3
+        project_description,                      // $4
+        startDate,                                // $5
+        endDate,                                  // $6
+        responsible_party,                        // $7
+        intended_user,                            // $8
+        intended_use_of_inventory,                // $9
+        organisational_boundary_type,             // $10
+        reporting_protocol,                       // $11
+        base_year,                                // $12
+        team_assignments,                         // $13 - Array of user IDs
+        JSON.stringify(base_year_emissions),      // $14 - JSONB array
+        JSON.stringify(org_boundaries),           // $15 - JSONB array
+        base_year_recalculation_policy,           // $16
+        context_for_significant_changes,          // $17
+        non_ghg_methodologies,                    // $18
+        methodologies_references,                 // $19
+        excluded_facilities,                      // $20
+        contractual_provisions,                   // $21
+        external_assurance,                       // $22
+        inventory_uncertainty,                    // $23
+        ghg_sequestration,                        // $24
+        organisational_diagram                    // $25
+      ]
+    };
 
-      if (!new_project_id) {
-        return this.utility.response.init(res, false, status_message || "Project creation failed", {
-          error: "PROJECT_CREATION_FAILED"
-        }, 400);
-      }
+    const result = await this.utility.sql.query(query);
+    console.log("Result = ", result);
 
-      return this.utility.response.init(
-        res,
-        true,
-        status_message || "Project created successfully",
-        {
-          project_id: new_project_id,
-          project_name,
-          facility_id,
-          creator_user_id,
-          industry,
-          // team_members_added: team_member_ids.length,
-          team_members_added: team_assignments.length,
-          reporting_period: {
-            start: reporting_period_start,
-            end: reporting_period_end
-          }
-        },
-        201
-      );
-
-    } catch (error) {
-      console.error('Error creating project:', error);
-      return this.utility.response.init(
-        res,
-        false,
-        error.message.includes('overlapping') ? error.message : "Internal server error while creating project",
-        {
-          error: error.message.includes('overlapping') ? "OVERLAPPING_PROJECT" : "INTERNAL_SERVER_ERROR",
-          details: error.message
-        },
-        error.message.includes('overlapping') ? 400 : 500
-      );
+    if (!result.rows || result.rows.length === 0) {
+      return this.utility.response.init(res, false, "Project creation failed", {
+        error: "PROJECT_CREATION_FAILED"
+      }, 400);
     }
-  };
+
+    const { new_project_id, status_message } = result.rows[0];
+
+    if (!new_project_id) {
+      return this.utility.response.init(res, false, status_message || "Project creation failed", {
+        error: "PROJECT_CREATION_FAILED",
+        details: status_message
+      }, 400);
+    }
+
+    return this.utility.response.init(
+      res,
+      true,
+      status_message || "Project created successfully",
+      {
+        project_id: new_project_id,
+        project_name,
+        facility_id,
+        creator_user_id,
+        team_members_added: team_assignments.length,
+        base_year_emissions_records: base_year_emissions.length,
+        org_boundaries_records: org_boundaries.length,
+        reporting_period: {
+          start: reporting_period_start,
+          end: reporting_period_end
+        }
+      },
+      201
+    );
+
+  } catch (error) {
+    console.error('Error creating project:', error);
+    return this.utility.response.init(
+      res,
+      false,
+      error.message.includes('overlapping') 
+        ? error.message 
+        : "Internal server error while creating project",
+      {
+        error: error.message.includes('overlapping') 
+          ? "OVERLAPPING_PROJECT" 
+          : "INTERNAL_SERVER_ERROR",
+        details: error.message
+      },
+      error.message.includes('overlapping') ? 400 : 500
+    );
+  }
+};
+
 
 
   ResolveAnomalyFlagAsIgnored = async (req, res) => {
