@@ -857,8 +857,14 @@ class ProjectActivities {
       external_assurance = null,
       inventory_uncertainty = null,
       ghg_sequestration = null,
-      organisational_diagram = null
+      organisational_diagram = null,
+                                        
     } = req.body;
+
+    const industry = 'Transportation & Logistics'
+
+    const facilityIdInt = parseInt(facility_id);
+
 
     // Convert date strings to Date objects if they're strings
     const startDate = new Date(reporting_period_start);
@@ -871,11 +877,12 @@ class ProjectActivities {
     const query = {
       text: `SELECT * FROM initialize_new_project_with_members(
         $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15,
-        $16, $17, $18, $19, $20, $21, $22, $23, $24, $25
+        $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26
       )`,
       values: [
         creator_user_id,                          // $1
-        facility_id,                              // $2
+        // facility_id,                              // $2
+        facilityIdInt,                              // $2
         project_name,                             // $3
         project_description,                      // $4
         startDate,                                // $5
@@ -898,7 +905,8 @@ class ProjectActivities {
         external_assurance,                       // $22
         inventory_uncertainty,                    // $23
         ghg_sequestration,                        // $24
-        organisational_diagram                    // $25
+        organisational_diagram,                    // $25
+        industry                                  
       ]
     };
 
@@ -929,6 +937,7 @@ class ProjectActivities {
         project_name,
         facility_id,
         creator_user_id,
+        industry,
         team_members_added: team_assignments.length,
         base_year_emissions_records: base_year_emissions.length,
         org_boundaries_records: org_boundaries.length,
